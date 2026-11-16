@@ -18,7 +18,7 @@
         </div>
         <div>
           <h1 class="font-bold text-base tracking-tight text-white">Gemini Gold M1 Control Center</h1>
-          <p class="text-xs text-slate-400" id="sub-symbol">Menunggu koneksi MetaTrader 5...</p>
+          <p class="text-xs text-slate-400" id="sub-symbol">Menunggu sinkronisasi Firebase dari MT5...</p>
         </div>
       </div>
 
@@ -41,7 +41,7 @@
         <span class="text-xs text-slate-400" id="heartbeat-text">Update terakhir: -</span>
       </div>
       <p id="waiting-detail" class="text-base sm:text-lg font-semibold text-white leading-relaxed">
-        Belum ada data dari MT5. Pastikan bridge.js berjalan dan EA sudah dipasang di chart M1.
+        Menunggu data masuk dari MetaTrader 5. Pastikan EA sudah dipasang di chart M1 dan URL Firebase sudah diizinkan di MT5.
       </p>
 
       <!-- Checklist Visual Syarat Entry -->
@@ -120,7 +120,7 @@
         <!-- Area Chat -->
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs mb-3">
           <div class="text-slate-400">
-            Halo! Klik tombol pertanyaan di atas atau ketik pertanyaanmu di bawah. Saya otomatis membaca data chart MT5 kamu secara langsung.
+            Halo! Klik tombol pertanyaan di atas atau ketik pertanyaanmu di bawah. Saya otomatis membaca data chart MT5 kamu dari Firebase secara real-time.
           </div>
         </div>
 
@@ -137,9 +137,13 @@
   </main>
 
   <script>
-    const GEMINI_API_KEY = "AQ.Ab8RN6LYz6ppj_RqBqcqA-TL_wGDVwAZnCfS0-M7R3_an_RQcw";
-    const GEMINI_MODEL = "gemini-flash-latest";
+    const FIREBASE_DB_URL = "https://gold-2904d-default-rtdb.asia-southeast1.firebasedatabase.app/bot_status.json";
+    const GEMINI_API_KEY  = "AQ.Ab8RN6LYz6ppj_RqBqcqA-TL_wGDVwAZnCfS0-M7R3_an_RQcw";
+    const GEMINI_MODEL    = "gemini-flash-latest";
+
     let currentBotData = null;
+    let lastSeenHeartbeat = null;
+    let lastHeartbeatChangeMs = 0;
 
     // --- INISIALISASI CHART ---
     const chartContainer = document.getElementById('tv-chart');
@@ -164,26 +168,40 @@
       chart.applyOptions({ width: chartContainer.clientWidth });
     });
 
-    // --- POLLING DATA LIVE DARI BRIDGE MT5 ---
-    async function fetchBotStatus() {
+    // --- AMBIL DATA LIVE LANGSUNG DARI FIREBASE ---
+    async function fetchFirebaseStatus() {
       try {
-        const res = await fetch('/api/status');
-        const payload = await res.json();
+        const res = await fetch(`${FIREBASE_DB_URL}?t=${Date.now()}`);
+        const d = await res.json();
+
         const badge = document.getElementById('status-badge');
         const dot = document.getElementById('status-dot');
         const statusTxt = document.getElementById('status-text');
 
-        if (!payload.connected || !payload.data) {
+        if (!d) {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30";
           dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-          statusTxt.textContent = "BELUM AKTIF / MT5 TERPUTUS";
+          statusTxt.textContent = "BELUM ADA DATA DARI MT5";
           return;
         }
 
-        const d = payload.data;
+        const nowMs = Date.now();
+        if (d.heartbeat !== lastSeenHeartbeat) {
+          lastSeenHeartbeat = d.heartbeat;
+          lastHeartbeatChangeMs = nowMs;
+        }
+
+        const utcAgeSec = d.utc_sec ? Math.abs(Math.floor(nowMs / 1000) - d.utc_sec) : 999;
+        const localAgeSec = Math.floor((nowMs - lastHeartbeatChangeMs) / 1000);
+        const isConnected = (utcAgeSec <= 15) || (localAgeSec <= 12);
+
         currentBotData = d;
 
-        if (d.algo_allowed) {
+        if (!isConnected) {
+          badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30";
+          dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+          statusTxt.textContent = "MT5 OFFLINE / TERPUTUS";
+        } else if (d.algo_allowed) {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
           dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping";
           statusTxt.textContent = "BOT AKTIF & SIAP ENTRY";
@@ -194,7 +212,7 @@
         }
 
         document.getElementById('sub-symbol').textContent = `${d.symbol} • Balance: $${d.balance} • Equity: $${d.equity} • Spread: ${d.spread}/${d.max_spread}`;
-        document.getElementById('heartbeat-text').textContent = `Sinkronisasi: ${payload.age_sec} dtk lalu | Update Gemini: ${d.gemini_updated}`;
+        document.getElementById('heartbeat-text').textContent = `Pulse #${d.heartbeat} | Update Gemini: ${d.gemini_updated}`;
         document.getElementById('waiting-detail').textContent = d.waiting_detail;
         document.getElementById('live-price-tag').textContent = `Bid: ${d.bid}`;
 
@@ -240,8 +258,8 @@
       }
     }
 
-    setInterval(fetchBotStatus, 2000);
-    fetchBotStatus();
+    setInterval(fetchFirebaseStatus, 2000);
+    fetchFirebaseStatus();
 
     // --- FITUR TANYA BOT / GEMINI AI ---
     function appendChat(sender, text, isUser = false) {
@@ -263,7 +281,7 @@
 
       const liveContext = currentBotData
         ? `Data Live MT5 saat ini -> Symbol: ${currentBotData.symbol}, Algo Aktif: ${currentBotData.algo_allowed}, Bid: ${currentBotData.bid}, Spread: ${currentBotData.spread}/${currentBotData.max_spread}, Arahan Gemini 5m: ${currentBotData.gemini_bias} (${currentBotData.gemini_vol}), EMA8 M1: ${currentBotData.ema8}, EMA21 M1: ${currentBotData.ema21}, RSI(7) M1: ${currentBotData.rsi}, Titik Trigger Breakout Buy: ${currentBotData.trigger_buy}, Titik Trigger Breakout Sell: ${currentBotData.trigger_sell}, Kuota Posisi: ${currentBotData.open_positions}/${currentBotData.max_positions}, Status EA: "${currentBotData.waiting_detail}".`
-        : "MT5 belum terhubung ke web saat ini.";
+        : "MT5 belum terhubung ke Firebase saat ini.";
 
       const fullPrompt = `Kamu adalah asisten bot trading Gold M1. Jawab pertanyaan user secara singkat, jelas, dan langsung pada intinya dalam Bahasa Indonesia berdasarkan data live berikut:\n${liveContext}\n\nPertanyaan user: ${question}`;
 
