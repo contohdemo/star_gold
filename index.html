@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gemini Gold M1 Live Monitor & AI Assistant</title>
+  <title>Gemini Gold M5 Live Monitor & AI Assistant</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -14,16 +14,20 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold">
-          AU
+          M5
         </div>
         <div>
-          <h1 class="font-bold text-base tracking-tight text-white">Gemini Gold M1 Control Center</h1>
+          <h1 class="font-bold text-base tracking-tight text-white">Gemini Gold M5 Fundamental Control Center</h1>
           <p class="text-xs text-slate-400" id="sub-symbol">Menunggu sinkronisasi Firebase dari MT5...</p>
         </div>
       </div>
 
-      <!-- Status Aktif / Tidak -->
-      <div class="flex items-center gap-3">
+      <!-- Status Aktif & Tombol Ubah Lot Cepat -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button onclick="changeLotSize()" class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 transition">
+          Lot: <span id="header-lot">0.01</span> (Ubah)
+        </button>
+
         <div id="status-badge" class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">
           <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
           <span id="status-text">BELUM AKTIF / TERPUTUS</span>
@@ -34,32 +38,66 @@
 
   <main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
 
-    <!-- Row 1: Kotak Utama Konfirmasi yang Sedang Ditunggu Bot -->
-    <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-lg">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Status Konfirmasi Saat Ini (M1 Engine)</span>
+    <!-- Row 1: Kotak Utama Jadwal M5 & Kartu Posisi Terbuka -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-lg space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Status Jadwal M5 (Tanya AI :x9 &rarr; Entry :x0)</span>
         <span class="text-xs text-slate-400" id="heartbeat-text">Update terakhir: -</span>
       </div>
       <p id="waiting-detail" class="text-base sm:text-lg font-semibold text-white leading-relaxed">
         Menunggu data masuk dari MetaTrader 5...
       </p>
 
-      <!-- Checklist Visual Syarat Entry -->
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-4 pt-4 border-t border-slate-800/80 text-xs">
+      <!-- Kartu Detail Posisi Terbuka (Muncul Otomatis Jika Ada Open Posisi) -->
+      <div id="open-pos-card" class="hidden bg-slate-950 border border-amber-500/40 rounded-lg p-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <span class="text-xs font-bold text-amber-400 uppercase tracking-wide" id="pos-title">POSISI AKTIF TERBUKA</span>
+          <span class="text-xs font-mono font-bold" id="pos-profit">Floating: $0.00</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs font-mono">
+          <div class="bg-slate-900 p-2 rounded border border-slate-800">
+            <div class="text-slate-400 text-[10px]">Timeframe</div>
+            <div class="font-bold text-white" id="pos-tf">M5</div>
+          </div>
+          <div class="bg-slate-900 p-2 rounded border border-slate-800">
+            <div class="text-slate-400 text-[10px]">Harga Entry</div>
+            <div class="font-bold text-cyan-300" id="pos-entry">-</div>
+          </div>
+          <div class="bg-slate-900 p-2 rounded border border-slate-800">
+            <div class="text-slate-400 text-[10px]">Stop Loss (SL)</div>
+            <div class="font-bold text-rose-400" id="pos-sl">-</div>
+          </div>
+          <div class="bg-slate-900 p-2 rounded border border-slate-800">
+            <div class="text-slate-400 text-[10px]">Take Profit (TP)</div>
+            <div class="font-bold text-emerald-400" id="pos-tp">-</div>
+          </div>
+          <div class="bg-slate-900 p-2 rounded border border-slate-800">
+            <div class="text-slate-400 text-[10px]">Rasio RR & Lot</div>
+            <div class="font-bold text-amber-300" id="pos-rr">-</div>
+          </div>
+          <div class="bg-slate-900 p-2 rounded border border-slate-800">
+            <div class="text-slate-400 text-[10px]">Est. Peluang TP</div>
+            <div class="font-bold text-emerald-300" id="pos-prob">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist Visual -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-3 border-t border-slate-800/80 text-xs">
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-          <div class="text-slate-400 mb-0.5">1. Arahan Gemini (5m)</div>
+          <div class="text-slate-400 mb-0.5">1. Arah Fundamental AI</div>
           <div id="chk-gemini" class="font-bold text-slate-200">-</div>
         </div>
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-          <div class="text-slate-400 mb-0.5">2. Tren EMA 8 vs 21</div>
+          <div class="text-slate-400 mb-0.5">2. Tren EMA 20 vs 50 (M5)</div>
           <div id="chk-ema" class="font-bold text-slate-200">-</div>
         </div>
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-          <div class="text-slate-400 mb-0.5">3. Filter RSI(7) M1</div>
+          <div class="text-slate-400 mb-0.5">3. RSI(14) & ATR M5</div>
           <div id="chk-rsi" class="font-bold text-slate-200">-</div>
         </div>
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-          <div class="text-slate-400 mb-0.5">4. Kuota Posisi</div>
+          <div class="text-slate-400 mb-0.5">4. Kuota Posisi M5</div>
           <div id="chk-quota" class="font-bold text-slate-200">-</div>
         </div>
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800 col-span-2 sm:col-span-1">
@@ -69,31 +107,29 @@
       </div>
     </section>
 
-    <!-- Row 2: Live Chart (Kiri) & Tanya Bot AI (Kanan) -->
+    <!-- Row 2: Live Chart M5 (Kiri) & Tanya Bot AI (Kanan) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-      <!-- Kolom Chart Visual Titik Konfirmasi -->
+      <!-- Kolom Chart Visual M5 -->
       <section class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
           <div>
-            <h2 class="font-bold text-sm text-white">Chart M1 Gold & Level Tunggu Konfirmasi</h2>
-            <p class="text-xs text-slate-400">Garis Hijau = Trigger Breakout Buy | Garis Merah = Trigger Breakout Sell</p>
+            <h2 class="font-bold text-sm text-white">Chart M5 Gold & Level Posisi / Referensi</h2>
+            <p class="text-xs text-slate-400">Garis Hijau = TP / High M5 | Garis Merah = SL / Low M5</p>
           </div>
           <div class="flex items-center gap-3 text-xs font-mono">
-            <span class="text-cyan-400">● EMA 8</span>
-            <span class="text-amber-400">● EMA 21</span>
+            <span class="text-cyan-400">● EMA 20</span>
+            <span class="text-amber-400">● EMA 50</span>
             <span id="live-price-tag" class="bg-slate-800 px-2.5 py-1 rounded text-white font-bold">Bid: -</span>
           </div>
         </div>
 
         <div id="tv-chart" class="w-full h-[360px] rounded-lg overflow-hidden border border-slate-800 bg-slate-950"></div>
 
-        <!-- Slot Status Multi-TF -->
-        <div class="grid grid-cols-4 gap-2 mt-3 text-center text-xs">
-          <div id="slot-M1" class="py-1.5 rounded bg-slate-950 border border-slate-800 font-semibold">M1: -</div>
+        <!-- Status Slot -->
+        <div class="grid grid-cols-2 gap-2 mt-3 text-center text-xs">
           <div id="slot-M5" class="py-1.5 rounded bg-slate-950 border border-slate-800 font-semibold">M5: -</div>
-          <div id="slot-M15" class="py-1.5 rounded bg-slate-950 border border-slate-800 font-semibold">M15: -</div>
-          <div id="slot-H1" class="py-1.5 rounded bg-slate-950 border border-slate-800 font-semibold">H1: -</div>
+          <div id="slot-RR" class="py-1.5 rounded bg-slate-950 border border-slate-800 text-amber-300 font-semibold">Target RR: Minimal 1 : 2.0</div>
         </div>
       </section>
 
@@ -101,21 +137,21 @@
       <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[475px]">
         <div>
           <div class="flex items-center justify-between mb-1">
-            <h2 class="font-bold text-sm text-white">Tanya Bot & Analisa AI Live</h2>
+            <h2 class="font-bold text-sm text-white">Tanya Bot Fundamental & Posisi AI</h2>
             <span id="key-badge" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Sync Key...</span>
           </div>
-          <p class="text-xs text-slate-400 mb-3">Tanyakan kondisi chart M1 atau alasan bot belum entry saat ini.</p>
+          <p class="text-xs text-slate-400 mb-3">Tanya arah fundamental, probabilitas nyampe TP, atau detail posisi terbuka.</p>
 
           <!-- Tombol Pertanyaan Cepat -->
           <div class="flex flex-wrap gap-1.5 mb-3">
-            <button onclick="quickAsk('Bot lagi nunggu konfirmasi apa sekarang dan seberapa dekat ke titik entry?')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
-              Lagi nunggu konfirmasi apa?
+            <button onclick="quickAsk('Bagaimana arah fundamental Gold sekarang, berapa persen probabilitasnya, dan kira-kira nyampe ke TP ga? Kasih perkiraan win rate juga.')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
+              Fundamental, Probabilitas & Peluang TP
             </button>
-            <button onclick="quickAsk('Analisa struktur candle M1, EMA 8/21, dan RSI saat ini. Peluang lebih kuat Buy atau Sell?')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
-              Analisa setup M1 sekarang
+            <button onclick="quickAsk('Cek apakah ada posisi yang lagi kebuka sekarang? Jelaskan Entry, SL, TP, dan Timeframe-nya, serta peluang kena TP.')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
+              Cek Open Posisi (Entry, SL, TP, TF)
             </button>
-            <button onclick="quickAsk('Apakah spread dan volatilitas Gold aman buat entry sekarang?')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
-              Cek keamanan spread
+            <button onclick="quickAsk('Kapan jadwal tanya Gemini dan entry M5 berikutnya?')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
+              Jadwal entry M5 berikutnya
             </button>
           </div>
         </div>
@@ -123,13 +159,13 @@
         <!-- Area Chat -->
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs mb-3">
           <div class="text-slate-400">
-            Halo! Klik tombol pertanyaan di atas atau ketik pertanyaanmu di bawah. Saya otomatis membaca data chart MT5 dan API Key dari Firebase kamu.
+            Halo! Ketuk tombol di atas atau ketik pertanyaanmu untuk mengecek arah fundamental, probabilitas menyentuh TP, perkiraan win rate, maupun detail Entry/SL/TP posisi yang sedang aktif.
           </div>
         </div>
 
         <!-- Input Pertanyaan -->
         <form id="chat-form" class="flex gap-2">
-          <input id="chat-input" type="text" placeholder="Tanya bot..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500" required />
+          <input id="chat-input" type="text" placeholder="Tanya fundamental, peluang TP, atau posisi..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500" required />
           <button type="submit" id="send-btn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs transition">
             Tanya
           </button>
@@ -143,6 +179,7 @@
     const FIREBASE_BASE   = "https://gold-2904d-default-rtdb.asia-southeast1.firebasedatabase.app";
     const FIREBASE_STATUS = `${FIREBASE_BASE}/bot_status.json`;
     const FIREBASE_CONFIG = `${FIREBASE_BASE}/config.json`;
+    const FIREBASE_LOT    = `${FIREBASE_BASE}/config/lot_size.json`;
     const GEMINI_MODELS   = ["gemini-2.5-flash", "gemini-flash-latest"];
 
     let currentBotData = null;
@@ -150,8 +187,8 @@
     let lastSeenHeartbeat = null;
     let lastHeartbeatChangeMs = 0;
 
-    // --- AMBIL API KEY OTOMATIS DARI FIREBASE ---
-    async function loadApiKeyFromFirebase() {
+    // --- AMBIL CONFIG (API KEY & LOT) DARI FIREBASE ---
+    async function loadConfigFromFirebase() {
       const badge = document.getElementById('key-badge');
       try {
         const res = await fetch(`${FIREBASE_CONFIG}?t=${Date.now()}`);
@@ -170,6 +207,58 @@
       return "";
     }
 
+    // --- UBAH LOT LANGSUNG DARI WEB ---
+    async function changeLotSize() {
+      const currentLot = currentBotData ? currentBotData.active_lot : 0.01;
+      const input = prompt("Masukkan ukuran Lot baru untuk MT5 (contoh: 0.01, 0.02, 0.05):", currentLot);
+      if (!input) return;
+      const parsed = parseFloat(input.replace(',', '.'));
+      if (isNaN(parsed) || parsed < 0.01 || parsed > 10) {
+        alert("Ukuran lot tidak valid. Masukkan angka minimal 0.01.");
+        return;
+      }
+      try {
+        await fetch(FIREBASE_LOT, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Number(parsed.toFixed(2)))
+        });
+        document.getElementById('header-lot').textContent = parsed.toFixed(2);
+        appendChat("System", `Ukuran Lot berhasil diubah menjadi ${parsed.toFixed(2)}. MT5 otomatis menyesuaikan dalam 2 detik.`, false);
+      } catch (e) {
+        alert("Gagal menyimpan Lot ke Firebase.");
+      }
+    }
+
+    // --- HITUNG ESTIMASI PROBABILITAS & WINRATE BERDASARKAN DATA LIVE ---
+    function computeProbabilityMetrics(d) {
+      if (!d) return { fundProb: 55, tpProb: 45, estWinRate: "45% - 52%" };
+      const trendAligned = (d.gemini_bias === "BUY" && d.ema8 > d.ema21) || (d.gemini_bias === "SELL" && d.ema8 < d.ema21);
+      const rsiHealthy   = (d.gemini_bias === "BUY" && d.rsi > 48 && d.rsi < 72) || (d.gemini_bias === "SELL" && d.rsi < 52 && d.rsi > 28);
+
+      let fundProb = 58;
+      if (trendAligned) fundProb += 11;
+      if (rsiHealthy)   fundProb += 6;
+
+      let tpProb = trendAligned ? 54 : 44;
+      if (d.active_pos) {
+        const totalDist = Math.abs(d.active_pos.tp - d.active_pos.entry);
+        const remDist   = d.active_pos.type === "BUY"
+          ? Math.max(0, d.active_pos.tp - d.bid)
+          : Math.max(0, d.ask - d.active_pos.tp);
+        const progress = totalDist > 0 ? Math.max(0, Math.min(1, (totalDist - remDist) / totalDist)) : 0;
+        tpProb = Math.min(88, Math.max(25, Math.round(tpProb + (progress * 35))));
+      }
+
+      const wrLow  = Math.max(38, tpProb - 5);
+      const wrHigh = Math.min(85, tpProb + 6);
+      return {
+        fundProb: Math.min(85, fundProb),
+        tpProb: tpProb,
+        estWinRate: `${wrLow}% - ${wrHigh}%`
+      };
+    }
+
     // --- INISIALISASI CHART ---
     const chartContainer = document.getElementById('tv-chart');
     const chart = LightweightCharts.createChart(chartContainer, {
@@ -183,11 +272,11 @@
       upColor: '#10b981', downColor: '#f43f5e',
       borderVisible: false, wickUpColor: '#10b981', wickDownColor: '#f43f5e'
     });
-    const ema8Series = chart.addLineSeries({ color: '#22d3ee', lineWidth: 2, title: 'EMA 8' });
-    const ema21Series = chart.addLineSeries({ color: '#fbbf24', lineWidth: 2, title: 'EMA 21' });
+    const ema8Series = chart.addLineSeries({ color: '#22d3ee', lineWidth: 2, title: 'EMA 20' });
+    const ema21Series = chart.addLineSeries({ color: '#fbbf24', lineWidth: 2, title: 'EMA 50' });
 
-    let buyLine = null;
-    let sellLine = null;
+    let topLine = null;
+    let botLine = null;
 
     window.addEventListener('resize', () => {
       chart.applyOptions({ width: chartContainer.clientWidth });
@@ -221,6 +310,7 @@
         const isConnected = (utcAgeSec <= 20) || (localAgeSec <= 15);
 
         currentBotData = d;
+        const metrics = computeProbabilityMetrics(d);
 
         if (!isConnected) {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30";
@@ -229,32 +319,50 @@
         } else if (d.algo_allowed) {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
           dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping";
-          statusTxt.textContent = "BOT AKTIF & SIAP ENTRY";
+          statusTxt.textContent = "BOT M5 AKTIF";
         } else {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30";
           dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
           statusTxt.textContent = "TERHUBUNG (ALGO TRADING MATI)";
         }
 
-        document.getElementById('sub-symbol').textContent = `${d.symbol} • Balance: $${d.balance} • Equity: $${d.equity} • Spread: ${d.spread}/${d.max_spread}`;
-        document.getElementById('heartbeat-text').textContent = `Pulse #${d.heartbeat} | Update Gemini: ${d.gemini_updated}`;
+        document.getElementById('header-lot').textContent = Number(d.active_lot || 0.01).toFixed(2);
+        document.getElementById('sub-symbol').textContent = `${d.symbol} (${d.timeframe || 'M5'}) • Balance: $${d.balance} • Equity: $${d.equity} • Spread: ${d.spread}`;
+        document.getElementById('heartbeat-text').textContent = `Pulse #${d.heartbeat} | Update AI: ${d.gemini_updated}`;
         document.getElementById('waiting-detail').textContent = d.waiting_detail;
         document.getElementById('live-price-tag').textContent = `Bid: ${d.bid}`;
 
-        document.getElementById('chk-gemini').textContent = `${d.gemini_bias} (${d.gemini_vol})`;
+        document.getElementById('chk-gemini').textContent = `${d.gemini_bias} (Prob ${metrics.fundProb}%)`;
         document.getElementById('chk-ema').textContent = d.ema8 > d.ema21 ? `BULLISH (${d.ema8} > ${d.ema21})` : `BEARISH (${d.ema8} < ${d.ema21})`;
-        document.getElementById('chk-rsi').textContent = `${d.rsi}`;
-        document.getElementById('chk-quota').textContent = `${d.open_positions} / ${d.max_positions} Posisi`;
-        document.getElementById('chk-lot').textContent = `WR ${d.win_rate}% (${d.total_trades}x) • Lot ${d.active_lot}`;
+        document.getElementById('chk-rsi').textContent = `RSI ${d.rsi} • ATR ${d.atr_m5 || '-'}`;
+        document.getElementById('chk-quota').textContent = `${d.open_positions} / 1 Posisi M5`;
+        document.getElementById('chk-lot').textContent = `Est. WR ${metrics.estWinRate} • Lot ${d.active_lot}`;
 
-        ['M1', 'M5', 'M15', 'H1'].forEach(tf => {
-          const el = document.getElementById(`slot-${tf}`);
-          const active = d.slots && d.slots[tf];
-          el.textContent = `${tf}: ${active ? 'POSISI AKTIF' : 'SIAP'}`;
-          el.className = active
-            ? "py-1.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-semibold"
-            : "py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-semibold";
-        });
+        // Update Kartu Open Posisi
+        const posCard = document.getElementById('open-pos-card');
+        if (d.active_pos) {
+          posCard.classList.remove('hidden');
+          const p = d.active_pos;
+          document.getElementById('pos-title').textContent = `POSISI AKTIF: ${p.type} ${p.symbol} (${p.tf}) • Ticket #${p.ticket}`;
+          const profEl = document.getElementById('pos-profit');
+          profEl.textContent = `Floating: ${p.profit >= 0 ? '+' : ''}$${p.profit.toFixed(2)}`;
+          profEl.className = p.profit >= 0 ? "text-xs font-mono font-bold text-emerald-400" : "text-xs font-mono font-bold text-rose-400";
+
+          document.getElementById('pos-tf').textContent = p.tf;
+          document.getElementById('pos-entry').textContent = p.entry;
+          document.getElementById('pos-sl').textContent = p.sl;
+          document.getElementById('pos-tp').textContent = p.tp;
+          document.getElementById('pos-rr').textContent = `1:${p.rr} (${p.lot} lot)`;
+          document.getElementById('pos-prob').textContent = `~${metrics.tpProb}% ke TP`;
+        } else {
+          posCard.classList.add('hidden');
+        }
+
+        const slotM5 = document.getElementById('slot-M5');
+        slotM5.textContent = d.active_pos ? `M5: POSISI ${d.active_pos.type} AKTIF` : 'M5: SIAP JADWAL 10 MENIT';
+        slotM5.className = d.active_pos
+          ? "py-1.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-semibold"
+          : "py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-300 font-semibold";
 
         if (d.candles && d.candles.length > 0) {
           candleSeries.setData(d.candles.map(c => ({
@@ -263,41 +371,56 @@
           ema8Series.setData(d.candles.map(c => ({ time: c.time, value: c.ema8 })));
           ema21Series.setData(d.candles.map(c => ({ time: c.time, value: c.ema21 })));
 
-          if (buyLine) candleSeries.removePriceLine(buyLine);
-          if (sellLine) candleSeries.removePriceLine(sellLine);
+          if (topLine) candleSeries.removePriceLine(topLine);
+          if (botLine) candleSeries.removePriceLine(botLine);
 
-          buyLine = candleSeries.createPriceLine({
-            price: d.trigger_buy, color: '#10b981', lineWidth: 1,
-            lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Tunggu Buy'
-          });
-          sellLine = candleSeries.createPriceLine({
-            price: d.trigger_sell, color: '#f43f5e', lineWidth: 1,
-            lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Tunggu Sell'
-          });
+          if (d.active_pos) {
+            topLine = candleSeries.createPriceLine({
+              price: d.active_pos.tp, color: '#10b981', lineWidth: 2,
+              lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'TP Aktif'
+            });
+            botLine = candleSeries.createPriceLine({
+              price: d.active_pos.sl, color: '#f43f5e', lineWidth: 2,
+              lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'SL Aktif'
+            });
+          } else {
+            topLine = candleSeries.createPriceLine({
+              price: d.trigger_buy, color: '#10b981', lineWidth: 1,
+              lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'High M5'
+            });
+            botLine = candleSeries.createPriceLine({
+              price: d.trigger_sell, color: '#f43f5e', lineWidth: 1,
+              lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Low M5'
+            });
+          }
         }
       } catch (err) {
         console.error(err);
       }
     }
 
-    loadApiKeyFromFirebase();
+    loadConfigFromFirebase();
     setInterval(fetchFirebaseStatus, 2000);
     fetchFirebaseStatus();
 
-    // --- ANALISA CADANGAN OTOMATIS JIKA API LIMIT ---
+    // --- ANALISA CADANGAN LENGKAP (PROBABILITAS + DETAIL POSISI) ---
     function buildLocalFallbackReply(d, apiErrMsg) {
       if (!d) return "Data MT5 belum masuk ke Firebase. Pastikan MT5 menyala dan Algo Trading aktif.";
-      const distBuy = (d.trigger_buy - d.ask).toFixed(d.digits || 2);
-      const distSell = (d.bid - d.trigger_sell).toFixed(d.digits || 2);
-      const trend = d.ema8 > d.ema21 ? "Bullish (EMA 8 di atas EMA 21)" : "Bearish (EMA 8 di bawah EMA 21)";
-      const spreadOk = d.spread <= d.max_spread ? `Aman (${d.spread}/${d.max_spread})` : `Melebihi batas (${d.spread}/${d.max_spread} - bot menahan entry)`;
+      const m = computeProbabilityMetrics(d);
+      let posSection = "• Status Posisi: Tidak ada posisi terbuka saat ini (menunggu jadwal M5 berikutnya).\n";
+      if (d.active_pos) {
+        const p = d.active_pos;
+        posSection = `• Posisi Terbuka: ${p.type} ${p.symbol} di Timeframe ${p.tf} (Lot ${p.lot})\n` +
+                     `  - Harga Entry: ${p.entry} | SL: ${p.sl} | TP: ${p.tp} (RR 1:${p.rr})\n` +
+                     `  - Floating P/L: ${p.profit >= 0 ? '+' : ''}$${p.profit.toFixed(2)}\n`;
+      }
 
-      return `[Analisa Live Telemetri MT5]\n` +
-             `• Status Bot: ${d.waiting_detail}\n` +
-             `• Tren M1: ${trend} | RSI(7): ${d.rsi}\n` +
-             `• Jarak Trigger: Butuh +${distBuy} poin ke Breakout Buy (${d.trigger_buy}) atau -${distSell} poin ke Breakout Sell (${d.trigger_sell}).\n` +
-             `• Spread: ${spreadOk}\n` +
-             `(Catatan Gemini: ${apiErrMsg})`;
+      return `[Analisa Live Gold M5 & Probabilitas]\n` +
+             posSection +
+             `• Arah Fundamental AI: ${d.gemini_bias} (Probabilitas arah: ~${m.fundProb}%)\n` +
+             `• Peluang Nyampe ke TP (RR >= 1:2): ~${m.tpProb}% | Perkiraan Win Rate: ${m.estWinRate}\n` +
+             `• Jadwal: ${d.waiting_detail}\n` +
+             `(Info API: ${apiErrMsg})`;
     }
 
     // --- FITUR TANYA BOT / GEMINI AI ---
@@ -318,19 +441,34 @@
       btn.disabled = true;
       btn.textContent = '...';
 
-      const apiKey = await loadApiKeyFromFirebase();
+      const apiKey = await loadConfigFromFirebase();
       if (!apiKey) {
-        appendChat('Bot Monitor M1', buildLocalFallbackReply(currentBotData, "config/api_key belum diisi di Firebase"), false);
+        appendChat('Bot Monitor M5', buildLocalFallbackReply(currentBotData, "config/api_key belum diisi di Firebase"), false);
         btn.disabled = false;
         btn.textContent = 'Tanya';
         return;
       }
 
+      const m = computeProbabilityMetrics(currentBotData);
+      let posContext = "POSISI TERBUKA: TIDAK ADA posisi yang sedang berjalan saat ini.";
+      if (currentBotData && currentBotData.active_pos) {
+        const p = currentBotData.active_pos;
+        posContext = `POSISI TERBUKA AKTIF -> Arah: ${p.type}, Symbol: ${p.symbol}, Timeframe: ${p.tf}, Lot: ${p.lot}, Harga Entry: ${p.entry}, Stop Loss (SL): ${p.sl}, Take Profit (TP): ${p.tp}, Rasio RR: 1:${p.rr}, Floating Profit/Loss: $${p.profit.toFixed(2)}, Waktu Buka: ${p.open_time}.`;
+      }
+
       const liveContext = currentBotData
-        ? `Data Live MT5 saat ini -> Symbol: ${currentBotData.symbol}, Algo Aktif: ${currentBotData.algo_allowed}, Bid: ${currentBotData.bid}, Ask: ${currentBotData.ask}, Spread: ${currentBotData.spread}/${currentBotData.max_spread}, Arahan Gemini 5m: ${currentBotData.gemini_bias} (${currentBotData.gemini_vol}), EMA8 M1: ${currentBotData.ema8}, EMA21 M1: ${currentBotData.ema21}, RSI(7) M1: ${currentBotData.rsi}, Titik Trigger Breakout Buy: ${currentBotData.trigger_buy}, Titik Trigger Breakout Sell: ${currentBotData.trigger_sell}, Kuota Posisi: ${currentBotData.open_positions}/${currentBotData.max_positions}, Status EA: "${currentBotData.waiting_detail}".`
+        ? `Data Live MT5 -> Symbol: ${currentBotData.symbol}, Timeframe EA: M5, Bid: ${currentBotData.bid}, Ask: ${currentBotData.ask}, Lot Aktif: ${currentBotData.active_lot}, Keputusan Fundamental AI Terakhir: ${currentBotData.gemini_bias} (Update: ${currentBotData.gemini_updated}), EMA20 M5: ${currentBotData.ema8}, EMA50 M5: ${currentBotData.ema21}, RSI(14) M5: ${currentBotData.rsi}, ATR M5: ${currentBotData.atr_m5}, Estimasi Statistik Sistem: Probabilitas Fundamental ~${m.fundProb}%, Peluang Menyentuh TP ~${m.tpProb}%, Perkiraan Win Rate ${m.estWinRate}, Status Jadwal: "${currentBotData.waiting_detail}". ${posContext}`
         : "MT5 belum terhubung ke Firebase saat ini.";
 
-      const fullPrompt = `Kamu adalah asisten bot trading Gold M1. Jawab pertanyaan user secara singkat, jelas, dan langsung pada intinya dalam Bahasa Indonesia berdasarkan data live berikut:\n${liveContext}\n\nPertanyaan user: ${question}`;
+      const fullPrompt =
+        `Kamu adalah analis kuantitatif & asisten bot trading Gold (XAUUSD) khusus Timeframe M5.\n` +
+        `ATURAN WAJIB JAWABAN:\n` +
+        `1. Selalu sertakan PROBABILITAS (%) arah fundamental Gold (misal Bullish X% vs Bearish Y%).\n` +
+        `2. Selalu berikan estimasi peluang (%) apakah harga akan menyentuh target TP (RR minimal 1:2) beserta perkiraan kisaran WIN RATE-nya (misal 52% - 58%) berdasarkan jarak harga ke TP/SL dan volatilitas ATR M5.\n` +
+        `3. Jika user menanyakan posisi yang terbuka (atau jika ada posisi aktif), wajib jelaskan secara rinci: status posisi (BUY/SELL), Timeframe (M5), Harga Entry, Stop Loss (SL), Take Profit (TP), rasio RR, dan floating profit/loss-nya. Jika tidak ada posisi terbuka, sampaikan bahwa tidak ada open posisi saat ini.\n` +
+        `4. Jawab dalam Bahasa Indonesia yang jelas, ringkas, dan langsung pada poinnya.\n\n` +
+        `DATA LIVE SISTEM:\n${liveContext}\n\nPertanyaan user: ${question}`;
+
       let lastError = "Tidak ada respons";
 
       for (const model of GEMINI_MODELS) {
@@ -345,7 +483,7 @@
           const data = await response.json();
           const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (reply) {
-            appendChat('Bot Gemini M1', reply, false);
+            appendChat('Bot Gemini M5', reply, false);
             btn.disabled = false;
             btn.textContent = 'Tanya';
             return;
@@ -356,7 +494,7 @@
         }
       }
 
-      appendChat('Bot Monitor M1', buildLocalFallbackReply(currentBotData, lastError), false);
+      appendChat('Bot Monitor M5', buildLocalFallbackReply(currentBotData, lastError), false);
       btn.disabled = false;
       btn.textContent = 'Tanya';
     }
