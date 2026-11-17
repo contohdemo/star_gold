@@ -22,8 +22,12 @@
         </div>
       </div>
 
-      <!-- Status Aktif & Tombol Ubah Lot Cepat -->
-      <div class="flex flex-wrap items-center gap-2.5">
+      <!-- Status Aktif & Tombol Ubah Lot / Tambah Key -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="addNewApiKeyToPool()" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 transition">
+          + Tambah API Key
+        </button>
+
         <button onclick="changeLotSize()" class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 transition">
           Lot: <span id="header-lot">0.01</span> (Ubah)
         </button>
@@ -48,7 +52,7 @@
         Menunggu data masuk dari MetaTrader 5...
       </p>
 
-      <!-- Kartu Detail Posisi Terbuka (Muncul Otomatis Jika Ada Open Posisi) -->
+      <!-- Kartu Detail Posisi Terbuka -->
       <div id="open-pos-card" class="hidden bg-slate-950 border border-amber-500/40 rounded-lg p-3.5">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
           <span class="text-xs font-bold text-amber-400 uppercase tracking-wide" id="pos-title">POSISI AKTIF TERBUKA</span>
@@ -140,7 +144,7 @@
             <h2 class="font-bold text-sm text-white">Tanya Bot Fundamental & Posisi AI</h2>
             <span id="key-badge" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Sync Key...</span>
           </div>
-          <p class="text-xs text-slate-400 mb-3">Tanya arah fundamental, probabilitas nyampe TP, atau detail posisi terbuka.</p>
+          <p class="text-xs text-slate-400 mb-3">Otomatis merotasi API Key jika kuota habis.</p>
 
           <!-- Tombol Pertanyaan Cepat -->
           <div class="flex flex-wrap gap-1.5 mb-3">
@@ -159,7 +163,7 @@
         <!-- Area Chat -->
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs mb-3">
           <div class="text-slate-400">
-            Halo! Ketuk tombol di atas atau ketik pertanyaanmu untuk mengecek arah fundamental, probabilitas menyentuh TP, perkiraan win rate, maupun detail Entry/SL/TP posisi yang sedang aktif.
+            Halo! Sistem rotasi multi-key aktif. Ketuk tombol di atas atau ketik pertanyaanmu untuk mengecek arah fundamental, probabilitas TP, win rate, atau detail posisi terbuka.
           </div>
         </div>
 
@@ -180,31 +184,92 @@
     const FIREBASE_STATUS = `${FIREBASE_BASE}/bot_status.json`;
     const FIREBASE_CONFIG = `${FIREBASE_BASE}/config.json`;
     const FIREBASE_LOT    = `${FIREBASE_BASE}/config/lot_size.json`;
-    const GEMINI_MODELS   = ["gemini-2.5-flash", "gemini-flash-latest"];
+    const GEMINI_MODELS   = ["gemini-flash-lite-latest", "gemini-flash-latest"];
 
     let currentBotData = null;
-    let cachedApiKey = "";
+    let keyPool = [];
+    let activeKeyIndex = 0;
     let lastSeenHeartbeat = null;
     let lastHeartbeatChangeMs = 0;
 
-    // --- AMBIL CONFIG (API KEY & LOT) DARI FIREBASE ---
+    // --- AMBIL POOL API KEYS & ACTIVE INDEX DARI FIREBASE ---
     async function loadConfigFromFirebase() {
       const badge = document.getElementById('key-badge');
       try {
         const res = await fetch(`${FIREBASE_CONFIG}?t=${Date.now()}`);
         const cfg = await res.json();
-        if (cfg && cfg.api_key && cfg.api_key.trim().length > 10) {
-          cachedApiKey = cfg.api_key.trim();
-          badge.textContent = "AI Ready";
+        const pool = [];
+
+        if (cfg && cfg.api_keys) {
+          const vals = Array.isArray(cfg.api_keys) ? cfg.api_keys : Object.values(cfg.api_keys);
+          vals.forEach(k => {
+            if (typeof k === 'string' && k.trim().length > 15 && !pool.includes(k.trim())) {
+              pool.push(k.trim());
+            }
+          });
+        }
+        if (cfg && typeof cfg.api_key === 'string' && cfg.api_key.trim().length > 15) {
+          const single = cfg.api_key.trim();
+          if (!pool.includes(single)) pool.push(single);
+        }
+
+        keyPool = pool;
+        if (cfg && typeof cfg.active_key_index === 'number' && cfg.active_key_index >= 0 && cfg.active_key_index < keyPool.length) {
+          activeKeyIndex = cfg.active_key_index;
+        } else if (activeKeyIndex >= keyPool.length) {
+          activeKeyIndex = 0;
+        }
+
+        if (keyPool.length > 0) {
+          badge.textContent = `Key #${activeKeyIndex + 1}/${keyPool.length} Ready`;
           badge.className = "text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
-          return cachedApiKey;
+          return keyPool;
         }
       } catch (e) {
         console.error("Gagal memuat config Firebase:", e);
       }
       badge.textContent = "Key Kosong";
       badge.className = "text-[10px] px-2 py-0.5 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30";
-      return "";
+      return [];
+    }
+
+    async function saveActiveKeyIndex(newIdx) {
+      activeKeyIndex = newIdx;
+      try {
+        await fetch(`${FIREBASE_BASE}/config/active_key_index.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newIdx)
+        });
+      } catch (e) {}
+    }
+
+    // --- TAMBAH API KEY CADANGAN LANGSUNG DARI WEB ---
+    async function addNewApiKeyToPool() {
+      const newKey = prompt("Tempel API Key Gemini baru dari akun Gmail lain untuk ditambahkan ke antrean rotasi:");
+      if (!newKey || newKey.trim().length < 15) return;
+      const cleanKey = newKey.trim();
+
+      await loadConfigFromFirebase();
+      if (keyPool.includes(cleanKey)) {
+        alert("API Key ini sudah terdaftar di dalam daftar rotasi.");
+        return;
+      }
+      keyPool.push(cleanKey);
+      const objMap = {};
+      keyPool.forEach((k, idx) => { objMap[String(idx)] = k; });
+
+      try {
+        await fetch(`${FIREBASE_BASE}/config/api_keys.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(objMap)
+        });
+        await loadConfigFromFirebase();
+        appendChat("System", `Berhasil menambahkan API Key #${keyPool.length} ke sistem rotasi otomatis!`, false);
+      } catch (e) {
+        alert("Gagal menyimpan API Key ke Firebase.");
+      }
     }
 
     // --- UBAH LOT LANGSUNG DARI WEB ---
@@ -230,7 +295,7 @@
       }
     }
 
-    // --- HITUNG ESTIMASI PROBABILITAS & WINRATE BERDASARKAN DATA LIVE ---
+    // --- HITUNG ESTIMASI PROBABILITAS & WINRATE ---
     function computeProbabilityMetrics(d) {
       if (!d) return { fundProb: 55, tpProb: 45, estWinRate: "45% - 52%" };
       const trendAligned = (d.gemini_bias === "BUY" && d.ema8 > d.ema21) || (d.gemini_bias === "SELL" && d.ema8 < d.ema21);
@@ -338,7 +403,6 @@
         document.getElementById('chk-quota').textContent = `${d.open_positions} / 1 Posisi M5`;
         document.getElementById('chk-lot').textContent = `Est. WR ${metrics.estWinRate} • Lot ${d.active_lot}`;
 
-        // Update Kartu Open Posisi
         const posCard = document.getElementById('open-pos-card');
         if (d.active_pos) {
           posCard.classList.remove('hidden');
@@ -403,7 +467,7 @@
     setInterval(fetchFirebaseStatus, 2000);
     fetchFirebaseStatus();
 
-    // --- ANALISA CADANGAN LENGKAP (PROBABILITAS + DETAIL POSISI) ---
+    // --- ANALISA CADANGAN LENGKAP ---
     function buildLocalFallbackReply(d, apiErrMsg) {
       if (!d) return "Data MT5 belum masuk ke Firebase. Pastikan MT5 menyala dan Algo Trading aktif.";
       const m = computeProbabilityMetrics(d);
@@ -420,10 +484,10 @@
              `• Arah Fundamental AI: ${d.gemini_bias} (Probabilitas arah: ~${m.fundProb}%)\n` +
              `• Peluang Nyampe ke TP (RR >= 1:2): ~${m.tpProb}% | Perkiraan Win Rate: ${m.estWinRate}\n` +
              `• Jadwal: ${d.waiting_detail}\n` +
-             `(Info API: ${apiErrMsg})`;
+             `(Catatan: Semua ${keyPool.length} API Key sedang limit kuota harian — klik "+ Tambah API Key" di atas untuk menambah key baru)`;
     }
 
-    // --- FITUR TANYA BOT / GEMINI AI ---
+    // --- FITUR TANYA BOT DENGAN ROTASI OTOMATIS ---
     function appendChat(sender, text, isUser = false) {
       const box = document.getElementById('chat-box');
       const div = document.createElement('div');
@@ -441,9 +505,9 @@
       btn.disabled = true;
       btn.textContent = '...';
 
-      const apiKey = await loadConfigFromFirebase();
-      if (!apiKey) {
-        appendChat('Bot Monitor M5', buildLocalFallbackReply(currentBotData, "config/api_key belum diisi di Firebase"), false);
+      const keys = await loadConfigFromFirebase();
+      if (keys.length === 0) {
+        appendChat('Bot Monitor M5', buildLocalFallbackReply(currentBotData, "Belum ada API Key di Firebase"), false);
         btn.disabled = false;
         btn.textContent = 'Tanya';
         return;
@@ -469,28 +533,42 @@
         `4. Jawab dalam Bahasa Indonesia yang jelas, ringkas, dan langsung pada poinnya.\n\n` +
         `DATA LIVE SISTEM:\n${liveContext}\n\nPertanyaan user: ${question}`;
 
-      let lastError = "Tidak ada respons";
+      let lastError = "Semua key limit";
 
-      for (const model of GEMINI_MODELS) {
-        try {
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: fullPrompt }] }]
-            })
-          });
-          const data = await response.json();
-          const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (reply) {
-            appendChat('Bot Gemini M5', reply, false);
-            btn.disabled = false;
-            btn.textContent = 'Tanya';
-            return;
+      for (let attempt = 0; attempt < keys.length; attempt++) {
+        const tryIdx = (activeKeyIndex + attempt) % keys.length;
+        const tryKey = keys[tryIdx];
+        let keyExhausted = false;
+
+        for (const model of GEMINI_MODELS) {
+          try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(tryKey)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: fullPrompt }] }]
+              })
+            });
+            const data = await response.json();
+            const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (reply) {
+              if (tryIdx !== activeKeyIndex) {
+                await saveActiveKeyIndex(tryIdx);
+              }
+              document.getElementById('key-badge').textContent = `Key #${tryIdx + 1}/${keys.length} Ready`;
+              appendChat(`Bot Gemini M5 (Key #${tryIdx + 1})`, reply, false);
+              btn.disabled = false;
+              btn.textContent = 'Tanya';
+              return;
+            }
+            lastError = data?.error?.message || `HTTP ${response.status}`;
+            if (response.status === 429 || response.status === 403 || response.status === 400) {
+              keyExhausted = true;
+              break;
+            }
+          } catch (e) {
+            lastError = e.message || "Network error";
           }
-          lastError = data?.error?.message || `HTTP ${response.status}`;
-        } catch (e) {
-          lastError = e.message || "Network error";
         }
       }
 
