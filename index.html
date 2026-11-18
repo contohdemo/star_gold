@@ -3,33 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gemini Gold M5 Live Monitor & AI Assistant</title>
+  <title>Gemini Gold M5 v11.00 • Smart 3-Layer Pyramiding</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
 
-  <!-- Top Navigation & Live Connection Status -->
+  <!-- Top Navigation -->
   <header class="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-20 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold">
-          M5
+        <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-xs">
+          v11
         </div>
         <div>
-          <h1 class="font-bold text-base tracking-tight text-white">Gemini Gold M5 Fundamental Control Center</h1>
+          <h1 class="font-bold text-base tracking-tight text-white">Gemini Gold M5 Smart Pyramiding Center</h1>
           <p class="text-xs text-slate-400" id="sub-symbol">Menunggu sinkronisasi Firebase dari MT5...</p>
         </div>
       </div>
 
-      <!-- Status Aktif & Tombol Ubah Lot / Tambah Key -->
       <div class="flex flex-wrap items-center gap-2">
         <button onclick="addNewApiKeyToPool()" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 transition">
           + Tambah API Key
         </button>
 
         <button onclick="changeLotSize()" class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 transition">
-          Lot: <span id="header-lot">0.01</span> (Ubah)
+          Base Lot: <span id="header-lot">0.01</span> (Ubah)
         </button>
 
         <div id="status-badge" class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">
@@ -42,54 +41,23 @@
 
   <main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
 
-    <!-- Row 1: Kotak Utama Jadwal M5 & Kartu Posisi Terbuka -->
+    <!-- Row 1: Status Engine & Daftar Layer Aktif -->
     <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-lg space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Status Jadwal M5 (Tanya AI :x9 &rarr; Entry :x0)</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Status Hybrid AI Regime + Smart 3-Layer Pyramiding</span>
         <span class="text-xs text-slate-400" id="heartbeat-text">Update terakhir: -</span>
       </div>
       <p id="waiting-detail" class="text-base sm:text-lg font-semibold text-white leading-relaxed">
         Menunggu data masuk dari MetaTrader 5...
       </p>
 
-      <!-- Kartu Detail Posisi Terbuka -->
-      <div id="open-pos-card" class="hidden bg-slate-950 border border-amber-500/40 rounded-lg p-3.5">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span class="text-xs font-bold text-amber-400 uppercase tracking-wide" id="pos-title">POSISI AKTIF TERBUKA</span>
-          <span class="text-xs font-mono font-bold" id="pos-profit">Floating: $0.00</span>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs font-mono">
-          <div class="bg-slate-900 p-2 rounded border border-slate-800">
-            <div class="text-slate-400 text-[10px]">Timeframe</div>
-            <div class="font-bold text-white" id="pos-tf">M5</div>
-          </div>
-          <div class="bg-slate-900 p-2 rounded border border-slate-800">
-            <div class="text-slate-400 text-[10px]">Harga Entry</div>
-            <div class="font-bold text-cyan-300" id="pos-entry">-</div>
-          </div>
-          <div class="bg-slate-900 p-2 rounded border border-slate-800">
-            <div class="text-slate-400 text-[10px]">Stop Loss (SL)</div>
-            <div class="font-bold text-rose-400" id="pos-sl">-</div>
-          </div>
-          <div class="bg-slate-900 p-2 rounded border border-slate-800">
-            <div class="text-slate-400 text-[10px]">Take Profit (TP)</div>
-            <div class="font-bold text-emerald-400" id="pos-tp">-</div>
-          </div>
-          <div class="bg-slate-900 p-2 rounded border border-slate-800">
-            <div class="text-slate-400 text-[10px]">Rasio RR & Lot</div>
-            <div class="font-bold text-amber-300" id="pos-rr">-</div>
-          </div>
-          <div class="bg-slate-900 p-2 rounded border border-slate-800">
-            <div class="text-slate-400 text-[10px]">Est. Peluang TP</div>
-            <div class="font-bold text-emerald-300" id="pos-prob">-</div>
-          </div>
-        </div>
-      </div>
+      <!-- Container Kartu Semua Layer Terbuka (Layer 1, 2, 3) -->
+      <div id="layers-container" class="hidden space-y-2.5"></div>
 
       <!-- Checklist Visual -->
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-3 border-t border-slate-800/80 text-xs">
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-          <div class="text-slate-400 mb-0.5">1. Arah Fundamental AI</div>
+          <div class="text-slate-400 mb-0.5">1. AI Regime (15m)</div>
           <div id="chk-gemini" class="font-bold text-slate-200">-</div>
         </div>
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
@@ -101,11 +69,11 @@
           <div id="chk-rsi" class="font-bold text-slate-200">-</div>
         </div>
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-          <div class="text-slate-400 mb-0.5">4. Kuota Posisi M5</div>
+          <div class="text-slate-400 mb-0.5">4. Layer Pyramiding</div>
           <div id="chk-quota" class="font-bold text-slate-200">-</div>
         </div>
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800 col-span-2 sm:col-span-1">
-          <div class="text-slate-400 mb-0.5">5. Win Rate & Lot</div>
+          <div class="text-slate-400 mb-0.5">5. Win Rate & Base Lot</div>
           <div id="chk-lot" class="font-bold text-emerald-400">-</div>
         </div>
       </div>
@@ -114,12 +82,11 @@
     <!-- Row 2: Live Chart M5 (Kiri) & Tanya Bot AI (Kanan) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-      <!-- Kolom Chart Visual M5 -->
       <section class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
           <div>
-            <h2 class="font-bold text-sm text-white">Chart M5 Gold & Level Posisi / Referensi</h2>
-            <p class="text-xs text-slate-400">Garis Hijau = TP / High M5 | Garis Merah = SL / Low M5</p>
+            <h2 class="font-bold text-sm text-white">Chart M5 Gold & Level TP/SL Bertingkat</h2>
+            <p class="text-xs text-slate-400">Garis Hijau = TP Layer | Garis Merah = SL / Break-Even Layer</p>
           </div>
           <div class="flex items-center gap-3 text-xs font-mono">
             <span class="text-cyan-400">● EMA 20</span>
@@ -130,10 +97,9 @@
 
         <div id="tv-chart" class="w-full h-[360px] rounded-lg overflow-hidden border border-slate-800 bg-slate-950"></div>
 
-        <!-- Status Slot -->
         <div class="grid grid-cols-2 gap-2 mt-3 text-center text-xs">
           <div id="slot-M5" class="py-1.5 rounded bg-slate-950 border border-slate-800 font-semibold">M5: -</div>
-          <div id="slot-RR" class="py-1.5 rounded bg-slate-950 border border-slate-800 text-amber-300 font-semibold">Target RR: Minimal 1 : 2.0</div>
+          <div id="slot-RR" class="py-1.5 rounded bg-slate-950 border border-slate-800 text-amber-300 font-semibold">Pyramiding: Max 3 Layer • RR >= 1:2</div>
         </div>
       </section>
 
@@ -141,35 +107,29 @@
       <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[475px]">
         <div>
           <div class="flex items-center justify-between mb-1">
-            <h2 class="font-bold text-sm text-white">Tanya Bot Fundamental & Posisi AI</h2>
+            <h2 class="font-bold text-sm text-white">Tanya Bot AI & Monitor Pyramiding</h2>
             <span id="key-badge" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Sync Key...</span>
           </div>
-          <p class="text-xs text-slate-400 mb-3">Otomatis merotasi API Key jika kuota habis.</p>
+          <p class="text-xs text-slate-400 mb-3">Analisa probabilitas tren, peluang TP tiap layer & status Break-Even.</p>
 
-          <!-- Tombol Pertanyaan Cepat -->
           <div class="flex flex-wrap gap-1.5 mb-3">
-            <button onclick="quickAsk('Bagaimana arah fundamental Gold sekarang, berapa persen probabilitasnya, dan kira-kira nyampe ke TP ga? Kasih perkiraan win rate juga.')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
-              Fundamental, Probabilitas & Peluang TP
+            <button onclick="quickAsk('Analisa arah tren Gold sekarang, berapa persen probabilitasnya, dan kira-kira nyampe ke TP ga? Kasih perkiraan win rate juga.')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
+              Tren, Probabilitas & Peluang TP
             </button>
-            <button onclick="quickAsk('Cek apakah ada posisi yang lagi kebuka sekarang? Jelaskan Entry, SL, TP, dan Timeframe-nya, serta peluang kena TP.')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
-              Cek Open Posisi (Entry, SL, TP, TF)
-            </button>
-            <button onclick="quickAsk('Kapan jadwal tanya Gemini dan entry M5 berikutnya?')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
-              Jadwal entry M5 berikutnya
+            <button onclick="quickAsk('Cek semua layer posisi yang lagi kebuka sekarang! Jelaskan Entry, SL, TP, dan TF masing-masing layer serta peluang tambah layer berikutnya.')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md border border-slate-700 transition">
+              Cek Semua Layer Aktif (Entry, SL, TP)
             </button>
           </div>
         </div>
 
-        <!-- Area Chat -->
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs mb-3">
           <div class="text-slate-400">
-            Halo! Sistem rotasi multi-key aktif. Ketuk tombol di atas atau ketik pertanyaanmu untuk mengecek arah fundamental, probabilitas TP, win rate, atau detail posisi terbuka.
+            Halo! Mesin v11.00 aktif. Ketuk tombol di atas atau ketik pertanyaanmu untuk mengecek regime tren AI, probabilitas menyentuh TP, perkiraan win rate, maupun detail Layer 1–3 yang sedang berjalan.
           </div>
         </div>
 
-        <!-- Input Pertanyaan -->
         <form id="chat-form" class="flex gap-2">
-          <input id="chat-input" type="text" placeholder="Tanya fundamental, peluang TP, atau posisi..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500" required />
+          <input id="chat-input" type="text" placeholder="Tanya tren, peluang TP, atau detail layer..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500" required />
           <button type="submit" id="send-btn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs transition">
             Tanya
           </button>
@@ -192,7 +152,6 @@
     let lastSeenHeartbeat = null;
     let lastHeartbeatChangeMs = 0;
 
-    // --- AMBIL POOL API KEYS & ACTIVE INDEX DARI FIREBASE ---
     async function loadConfigFromFirebase() {
       const badge = document.getElementById('key-badge');
       try {
@@ -225,9 +184,7 @@
           badge.className = "text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
           return keyPool;
         }
-      } catch (e) {
-        console.error("Gagal memuat config Firebase:", e);
-      }
+      } catch (e) {}
       badge.textContent = "Key Kosong";
       badge.className = "text-[10px] px-2 py-0.5 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30";
       return [];
@@ -244,7 +201,6 @@
       } catch (e) {}
     }
 
-    // --- TAMBAH API KEY CADANGAN LANGSUNG DARI WEB ---
     async function addNewApiKeyToPool() {
       const newKey = prompt("Tempel API Key Gemini baru dari akun Gmail lain untuk ditambahkan ke antrean rotasi:");
       if (!newKey || newKey.trim().length < 15) return;
@@ -252,7 +208,7 @@
 
       await loadConfigFromFirebase();
       if (keyPool.includes(cleanKey)) {
-        alert("API Key ini sudah terdaftar di dalam daftar rotasi.");
+        alert("API Key ini sudah terdaftar.");
         return;
       }
       keyPool.push(cleanKey);
@@ -266,20 +222,19 @@
           body: JSON.stringify(objMap)
         });
         await loadConfigFromFirebase();
-        appendChat("System", `Berhasil menambahkan API Key #${keyPool.length} ke sistem rotasi otomatis!`, false);
+        appendChat("System", `Berhasil menambahkan API Key #${keyPool.length} ke sistem rotasi!`, false);
       } catch (e) {
         alert("Gagal menyimpan API Key ke Firebase.");
       }
     }
 
-    // --- UBAH LOT LANGSUNG DARI WEB ---
     async function changeLotSize() {
       const currentLot = currentBotData ? currentBotData.active_lot : 0.01;
-      const input = prompt("Masukkan ukuran Lot baru untuk MT5 (contoh: 0.01, 0.02, 0.05):", currentLot);
+      const input = prompt("Masukkan Base Lot Layer 1 baru untuk MT5 (contoh: 0.01, 0.02, 0.03):", currentLot);
       if (!input) return;
       const parsed = parseFloat(input.replace(',', '.'));
       if (isNaN(parsed) || parsed < 0.01 || parsed > 10) {
-        alert("Ukuran lot tidak valid. Masukkan angka minimal 0.01.");
+        alert("Ukuran lot tidak valid.");
         return;
       }
       try {
@@ -289,42 +244,43 @@
           body: JSON.stringify(Number(parsed.toFixed(2)))
         });
         document.getElementById('header-lot').textContent = parsed.toFixed(2);
-        appendChat("System", `Ukuran Lot berhasil diubah menjadi ${parsed.toFixed(2)}. MT5 otomatis menyesuaikan dalam 2 detik.`, false);
+        appendChat("System", `Base Lot berhasil diubah menjadi ${parsed.toFixed(2)}. MT5 otomatis menyesuaikan dalam 2 detik.`, false);
       } catch (e) {
         alert("Gagal menyimpan Lot ke Firebase.");
       }
     }
 
-    // --- HITUNG ESTIMASI PROBABILITAS & WINRATE ---
     function computeProbabilityMetrics(d) {
-      if (!d) return { fundProb: 55, tpProb: 45, estWinRate: "45% - 52%" };
-      const trendAligned = (d.gemini_bias === "BUY" && d.ema8 > d.ema21) || (d.gemini_bias === "SELL" && d.ema8 < d.ema21);
-      const rsiHealthy   = (d.gemini_bias === "BUY" && d.rsi > 48 && d.rsi < 72) || (d.gemini_bias === "SELL" && d.rsi < 52 && d.rsi > 28);
+      if (!d) return { trendProb: 55, tpProb: 48, estWinRate: "48% - 55%" };
+      const isBuy = d.gemini_bias === "BUY_ONLY";
+      const isSell = d.gemini_bias === "SELL_ONLY";
+      const trendAligned = (isBuy && d.ema8 > d.ema21) || (isSell && d.ema8 < d.ema21);
+      const rsiHealthy   = (isBuy && d.rsi > 48 && d.rsi < 72) || (isSell && d.rsi < 52 && d.rsi > 28);
 
-      let fundProb = 58;
-      if (trendAligned) fundProb += 11;
-      if (rsiHealthy)   fundProb += 6;
+      let trendProb = (isBuy || isSell) ? 62 : 50;
+      if (trendAligned) trendProb += 10;
+      if (rsiHealthy)   trendProb += 6;
 
-      let tpProb = trendAligned ? 54 : 44;
-      if (d.active_pos) {
-        const totalDist = Math.abs(d.active_pos.tp - d.active_pos.entry);
-        const remDist   = d.active_pos.type === "BUY"
-          ? Math.max(0, d.active_pos.tp - d.bid)
-          : Math.max(0, d.ask - d.active_pos.tp);
-        const progress = totalDist > 0 ? Math.max(0, Math.min(1, (totalDist - remDist) / totalDist)) : 0;
-        tpProb = Math.min(88, Math.max(25, Math.round(tpProb + (progress * 35))));
+      let tpProb = trendAligned ? 56 : 46;
+      const layers = d.active_layers || [];
+      if (layers.length > 0) {
+        const p = layers[0];
+        const totalDist = Math.abs(p.tp - p.entry);
+        const remDist   = p.type === "BUY" ? Math.max(0, p.tp - d.bid) : Math.max(0, d.ask - p.tp);
+        const progress  = totalDist > 0 ? Math.max(0, Math.min(1, (totalDist - remDist) / totalDist)) : 0;
+        tpProb = Math.min(88, Math.max(28, Math.round(tpProb + (progress * 32))));
       }
 
-      const wrLow  = Math.max(38, tpProb - 5);
+      const wrLow  = Math.max(42, tpProb - 4);
       const wrHigh = Math.min(85, tpProb + 6);
       return {
-        fundProb: Math.min(85, fundProb),
+        trendProb: Math.min(86, trendProb),
         tpProb: tpProb,
         estWinRate: `${wrLow}% - ${wrHigh}%`
       };
     }
 
-    // --- INISIALISASI CHART ---
+    // --- CHART ---
     const chartContainer = document.getElementById('tv-chart');
     const chart = LightweightCharts.createChart(chartContainer, {
       layout: { background: { color: '#020617' }, textColor: '#94a3b8' },
@@ -339,15 +295,12 @@
     });
     const ema8Series = chart.addLineSeries({ color: '#22d3ee', lineWidth: 2, title: 'EMA 20' });
     const ema21Series = chart.addLineSeries({ color: '#fbbf24', lineWidth: 2, title: 'EMA 50' });
-
-    let topLine = null;
-    let botLine = null;
+    let activePriceLines = [];
 
     window.addEventListener('resize', () => {
       chart.applyOptions({ width: chartContainer.clientWidth });
     });
 
-    // --- AMBIL DATA LIVE LANGSUNG DARI FIREBASE ---
     async function fetchFirebaseStatus() {
       try {
         const res = await fetch(`${FIREBASE_STATUS}?t=${Date.now()}`);
@@ -358,8 +311,6 @@
         const statusTxt = document.getElementById('status-text');
 
         if (!d) {
-          badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30";
-          dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
           statusTxt.textContent = "BELUM ADA DATA DARI MT5";
           return;
         }
@@ -384,11 +335,11 @@
         } else if (d.algo_allowed) {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
           dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping";
-          statusTxt.textContent = "BOT M5 AKTIF";
+          statusTxt.textContent = "BOT v11.00 AKTIF";
         } else {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30";
           dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
-          statusTxt.textContent = "TERHUBUNG (ALGO TRADING MATI)";
+          statusTxt.textContent = "TERHUBUNG (ALGO MATI)";
         }
 
         document.getElementById('header-lot').textContent = Number(d.active_lot || 0.01).toFixed(2);
@@ -397,34 +348,46 @@
         document.getElementById('waiting-detail').textContent = d.waiting_detail;
         document.getElementById('live-price-tag').textContent = `Bid: ${d.bid}`;
 
-        document.getElementById('chk-gemini').textContent = `${d.gemini_bias} (Prob ${metrics.fundProb}%)`;
+        document.getElementById('chk-gemini').textContent = `${d.gemini_bias} (Prob ${metrics.trendProb}%)`;
         document.getElementById('chk-ema').textContent = d.ema8 > d.ema21 ? `BULLISH (${d.ema8} > ${d.ema21})` : `BEARISH (${d.ema8} < ${d.ema21})`;
         document.getElementById('chk-rsi').textContent = `RSI ${d.rsi} • ATR ${d.atr_m5 || '-'}`;
-        document.getElementById('chk-quota').textContent = `${d.open_positions} / 1 Posisi M5`;
+        document.getElementById('chk-quota').textContent = `${d.open_positions} / ${d.max_positions || 3} Layer`;
         document.getElementById('chk-lot').textContent = `Est. WR ${metrics.estWinRate} • Lot ${d.active_lot}`;
 
-        const posCard = document.getElementById('open-pos-card');
-        if (d.active_pos) {
-          posCard.classList.remove('hidden');
-          const p = d.active_pos;
-          document.getElementById('pos-title').textContent = `POSISI AKTIF: ${p.type} ${p.symbol} (${p.tf}) • Ticket #${p.ticket}`;
-          const profEl = document.getElementById('pos-profit');
-          profEl.textContent = `Floating: ${p.profit >= 0 ? '+' : ''}$${p.profit.toFixed(2)}`;
-          profEl.className = p.profit >= 0 ? "text-xs font-mono font-bold text-emerald-400" : "text-xs font-mono font-bold text-rose-400";
-
-          document.getElementById('pos-tf').textContent = p.tf;
-          document.getElementById('pos-entry').textContent = p.entry;
-          document.getElementById('pos-sl').textContent = p.sl;
-          document.getElementById('pos-tp').textContent = p.tp;
-          document.getElementById('pos-rr').textContent = `1:${p.rr} (${p.lot} lot)`;
-          document.getElementById('pos-prob').textContent = `~${metrics.tpProb}% ke TP`;
+        // Render Semua Layer Aktif
+        const layersContainer = document.getElementById('layers-container');
+        const layers = d.active_layers || [];
+        if (layers.length > 0) {
+          layersContainer.classList.remove('hidden');
+          layersContainer.innerHTML = layers.map(p => {
+            const profClass = p.profit >= 0 ? "text-emerald-400" : "text-rose-400";
+            const isBE = (p.type === "BUY" && p.sl >= p.entry) || (p.type === "SELL" && p.sl <= p.entry && p.sl > 0);
+            return `
+              <div class="bg-slate-950 border border-amber-500/40 rounded-lg p-3">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <span class="text-xs font-bold text-amber-400 uppercase">
+                    LAYER #${p.layer}: ${p.type} ${p.symbol} (${p.tf}) • Ticket #${p.ticket} ${isBE ? '<span class="ml-1.5 px-1.5 py-0.5 text-[10px] rounded bg-emerald-500/20 text-emerald-300">BREAK-EVEN AMAN</span>' : ''}
+                  </span>
+                  <span class="text-xs font-mono font-bold ${profClass}">Floating: ${p.profit >= 0 ? '+' : ''}$${p.profit.toFixed(2)}</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
+                  <div class="bg-slate-900 p-2 rounded border border-slate-800"><div class="text-slate-400 text-[10px]">Entry (${p.tf})</div><div class="font-bold text-cyan-300">${p.entry}</div></div>
+                  <div class="bg-slate-900 p-2 rounded border border-slate-800"><div class="text-slate-400 text-[10px]">Stop Loss</div><div class="font-bold text-rose-400">${p.sl}</div></div>
+                  <div class="bg-slate-900 p-2 rounded border border-slate-800"><div class="text-slate-400 text-[10px]">Take Profit</div><div class="font-bold text-emerald-400">${p.tp}</div></div>
+                  <div class="bg-slate-900 p-2 rounded border border-slate-800"><div class="text-slate-400 text-[10px]">Rasio RR</div><div class="font-bold text-amber-300">1 : ${p.rr}</div></div>
+                  <div class="bg-slate-900 p-2 rounded border border-slate-800"><div class="text-slate-400 text-[10px]">Lot Layer</div><div class="font-bold text-white">${p.lot}</div></div>
+                </div>
+              </div>
+            `;
+          }).join('');
         } else {
-          posCard.classList.add('hidden');
+          layersContainer.classList.add('hidden');
+          layersContainer.innerHTML = '';
         }
 
         const slotM5 = document.getElementById('slot-M5');
-        slotM5.textContent = d.active_pos ? `M5: POSISI ${d.active_pos.type} AKTIF` : 'M5: SIAP JADWAL 10 MENIT';
-        slotM5.className = d.active_pos
+        slotM5.textContent = layers.length > 0 ? `M5: ${layers.length}/${d.max_positions || 3} LAYER AKTIF` : `M5: MODE ${d.gemini_bias}`;
+        slotM5.className = layers.length > 0
           ? "py-1.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-semibold"
           : "py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-300 font-semibold";
 
@@ -435,59 +398,57 @@
           ema8Series.setData(d.candles.map(c => ({ time: c.time, value: c.ema8 })));
           ema21Series.setData(d.candles.map(c => ({ time: c.time, value: c.ema21 })));
 
-          if (topLine) candleSeries.removePriceLine(topLine);
-          if (botLine) candleSeries.removePriceLine(botLine);
+          activePriceLines.forEach(line => candleSeries.removePriceLine(line));
+          activePriceLines = [];
 
-          if (d.active_pos) {
-            topLine = candleSeries.createPriceLine({
-              price: d.active_pos.tp, color: '#10b981', lineWidth: 2,
-              lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'TP Aktif'
-            });
-            botLine = candleSeries.createPriceLine({
-              price: d.active_pos.sl, color: '#f43f5e', lineWidth: 2,
-              lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'SL Aktif'
+          if (layers.length > 0) {
+            layers.forEach(p => {
+              activePriceLines.push(candleSeries.createPriceLine({
+                price: p.tp, color: '#10b981', lineWidth: 2,
+                lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: `TP L${p.layer}`
+              }));
+              activePriceLines.push(candleSeries.createPriceLine({
+                price: p.sl, color: '#f43f5e', lineWidth: 2,
+                lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: `SL L${p.layer}`
+              }));
             });
           } else {
-            topLine = candleSeries.createPriceLine({
+            activePriceLines.push(candleSeries.createPriceLine({
               price: d.trigger_buy, color: '#10b981', lineWidth: 1,
               lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'High M5'
-            });
-            botLine = candleSeries.createPriceLine({
+            }));
+            activePriceLines.push(candleSeries.createPriceLine({
               price: d.trigger_sell, color: '#f43f5e', lineWidth: 1,
               lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Low M5'
-            });
+            }));
           }
         }
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     }
 
     loadConfigFromFirebase();
     setInterval(fetchFirebaseStatus, 2000);
     fetchFirebaseStatus();
 
-    // --- ANALISA CADANGAN LENGKAP ---
     function buildLocalFallbackReply(d, apiErrMsg) {
       if (!d) return "Data MT5 belum masuk ke Firebase. Pastikan MT5 menyala dan Algo Trading aktif.";
       const m = computeProbabilityMetrics(d);
-      let posSection = "• Status Posisi: Tidak ada posisi terbuka saat ini (menunggu jadwal M5 berikutnya).\n";
-      if (d.active_pos) {
-        const p = d.active_pos;
-        posSection = `• Posisi Terbuka: ${p.type} ${p.symbol} di Timeframe ${p.tf} (Lot ${p.lot})\n` +
-                     `  - Harga Entry: ${p.entry} | SL: ${p.sl} | TP: ${p.tp} (RR 1:${p.rr})\n` +
-                     `  - Floating P/L: ${p.profit >= 0 ? '+' : ''}$${p.profit.toFixed(2)}\n`;
+      const layers = d.active_layers || [];
+      let posSection = "• Status Posisi: Belum ada layer terbuka (memindai sinyal M5).\n";
+      if (layers.length > 0) {
+        posSection = layers.map(p =>
+          `• Layer #${p.layer} (${p.type} ${p.symbol} TF ${p.tf} | Lot ${p.lot}): Entry ${p.entry} | SL ${p.sl} | TP ${p.tp} (RR 1:${p.rr}) | Floating ${p.profit >= 0 ? '+' : ''}$${p.profit.toFixed(2)}`
+        ).join('\n') + '\n';
       }
 
-      return `[Analisa Live Gold M5 & Probabilitas]\n` +
+      return `[Analisa Live Gold M5 v11.00]\n` +
              posSection +
-             `• Arah Fundamental AI: ${d.gemini_bias} (Probabilitas arah: ~${m.fundProb}%)\n` +
+             `• Regime AI (15m): ${d.gemini_bias} (Probabilitas tren: ~${m.trendProb}%)\n` +
              `• Peluang Nyampe ke TP (RR >= 1:2): ~${m.tpProb}% | Perkiraan Win Rate: ${m.estWinRate}\n` +
-             `• Jadwal: ${d.waiting_detail}\n` +
-             `(Catatan: Semua ${keyPool.length} API Key sedang limit kuota harian — klik "+ Tambah API Key" di atas untuk menambah key baru)`;
+             `• Status: ${d.waiting_detail}\n` +
+             `(Info API: ${apiErrMsg})`;
     }
 
-    // --- FITUR TANYA BOT DENGAN ROTASI OTOMATIS ---
     function appendChat(sender, text, isUser = false) {
       const box = document.getElementById('chat-box');
       const div = document.createElement('div');
@@ -514,23 +475,25 @@
       }
 
       const m = computeProbabilityMetrics(currentBotData);
-      let posContext = "POSISI TERBUKA: TIDAK ADA posisi yang sedang berjalan saat ini.";
-      if (currentBotData && currentBotData.active_pos) {
-        const p = currentBotData.active_pos;
-        posContext = `POSISI TERBUKA AKTIF -> Arah: ${p.type}, Symbol: ${p.symbol}, Timeframe: ${p.tf}, Lot: ${p.lot}, Harga Entry: ${p.entry}, Stop Loss (SL): ${p.sl}, Take Profit (TP): ${p.tp}, Rasio RR: 1:${p.rr}, Floating Profit/Loss: $${p.profit.toFixed(2)}, Waktu Buka: ${p.open_time}.`;
+      const layers = currentBotData?.active_layers || [];
+      let posContext = "POSISI TERBUKA: TIDAK ADA layer aktif saat ini.";
+      if (layers.length > 0) {
+        posContext = "POSISI PYRAMIDING AKTIF (" + layers.length + " Layer):\n" + layers.map(p =>
+          `- Layer #${p.layer}: ${p.type} ${p.symbol}, Timeframe: ${p.tf}, Lot: ${p.lot}, Entry: ${p.entry}, SL: ${p.sl}, TP: ${p.tp}, Rasio RR: 1:${p.rr}, Floating: $${p.profit.toFixed(2)}`
+        ).join('\n');
       }
 
       const liveContext = currentBotData
-        ? `Data Live MT5 -> Symbol: ${currentBotData.symbol}, Timeframe EA: M5, Bid: ${currentBotData.bid}, Ask: ${currentBotData.ask}, Lot Aktif: ${currentBotData.active_lot}, Keputusan Fundamental AI Terakhir: ${currentBotData.gemini_bias} (Update: ${currentBotData.gemini_updated}), EMA20 M5: ${currentBotData.ema8}, EMA50 M5: ${currentBotData.ema21}, RSI(14) M5: ${currentBotData.rsi}, ATR M5: ${currentBotData.atr_m5}, Estimasi Statistik Sistem: Probabilitas Fundamental ~${m.fundProb}%, Peluang Menyentuh TP ~${m.tpProb}%, Perkiraan Win Rate ${m.estWinRate}, Status Jadwal: "${currentBotData.waiting_detail}". ${posContext}`
+        ? `Data Live MT5 v11.00 -> Symbol: ${currentBotData.symbol}, TF: M5, Bid: ${currentBotData.bid}, Ask: ${currentBotData.ask}, Base Lot: ${currentBotData.active_lot}, Regime AI: ${currentBotData.gemini_bias} (Update: ${currentBotData.gemini_updated}), EMA20 M5: ${currentBotData.ema8}, EMA50 M5: ${currentBotData.ema21}, RSI(14) M5: ${currentBotData.rsi}, ATR M5: ${currentBotData.atr_m5}, Estimasi Statistik: Probabilitas Tren ~${m.trendProb}%, Peluang Menyentuh TP ~${m.tpProb}%, Perkiraan Win Rate ${m.estWinRate}, Status Mesin: "${currentBotData.waiting_detail}".\n${posContext}`
         : "MT5 belum terhubung ke Firebase saat ini.";
 
       const fullPrompt =
-        `Kamu adalah analis kuantitatif & asisten bot trading Gold (XAUUSD) khusus Timeframe M5.\n` +
+        `Kamu adalah analis kuantitatif & asisten bot trading Gold (XAUUSD) v11.00 khusus M5 dengan sistem Smart 3-Layer Pyramiding.\n` +
         `ATURAN WAJIB JAWABAN:\n` +
-        `1. Selalu sertakan PROBABILITAS (%) arah fundamental Gold (misal Bullish X% vs Bearish Y%).\n` +
-        `2. Selalu berikan estimasi peluang (%) apakah harga akan menyentuh target TP (RR minimal 1:2) beserta perkiraan kisaran WIN RATE-nya (misal 52% - 58%) berdasarkan jarak harga ke TP/SL dan volatilitas ATR M5.\n` +
-        `3. Jika user menanyakan posisi yang terbuka (atau jika ada posisi aktif), wajib jelaskan secara rinci: status posisi (BUY/SELL), Timeframe (M5), Harga Entry, Stop Loss (SL), Take Profit (TP), rasio RR, dan floating profit/loss-nya. Jika tidak ada posisi terbuka, sampaikan bahwa tidak ada open posisi saat ini.\n` +
-        `4. Jawab dalam Bahasa Indonesia yang jelas, ringkas, dan langsung pada poinnya.\n\n` +
+        `1. Selalu sertakan PROBABILITAS (%) arah tren Gold berdasarkan Regime AI dan indikator.\n` +
+        `2. Selalu berikan estimasi peluang (%) apakah harga akan menyentuh target TP (RR minimal 1:2) beserta perkiraan kisaran WIN RATE-nya.\n` +
+        `3. Jika ada posisi terbuka (baik 1, 2, maupun 3 layer), sebutkan detail masing-masing layer secara jelas: Layer ke berapa, Timeframe (M5), Harga Entry, SL (termasuk jika sudah Break-Even), TP, rasio RR, dan floating profit/loss-nya.\n` +
+        `4. Jawab dalam Bahasa Indonesia yang ringkas, jelas, dan langsung ke inti.\n\n` +
         `DATA LIVE SISTEM:\n${liveContext}\n\nPertanyaan user: ${question}`;
 
       let lastError = "Semua key limit";
@@ -538,34 +501,26 @@
       for (let attempt = 0; attempt < keys.length; attempt++) {
         const tryIdx = (activeKeyIndex + attempt) % keys.length;
         const tryKey = keys[tryIdx];
-        let keyExhausted = false;
 
         for (const model of GEMINI_MODELS) {
           try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(tryKey)}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: fullPrompt }] }]
-              })
+              body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
             });
             const data = await response.json();
             const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
             if (reply) {
-              if (tryIdx !== activeKeyIndex) {
-                await saveActiveKeyIndex(tryIdx);
-              }
+              if (tryIdx !== activeKeyIndex) await saveActiveKeyIndex(tryIdx);
               document.getElementById('key-badge').textContent = `Key #${tryIdx + 1}/${keys.length} Ready`;
-              appendChat(`Bot Gemini M5 (Key #${tryIdx + 1})`, reply, false);
+              appendChat(`Bot Gemini v11 (Key #${tryIdx + 1})`, reply, false);
               btn.disabled = false;
               btn.textContent = 'Tanya';
               return;
             }
             lastError = data?.error?.message || `HTTP ${response.status}`;
-            if (response.status === 429 || response.status === 403 || response.status === 400) {
-              keyExhausted = true;
-              break;
-            }
+            if (response.status === 429 || response.status === 403 || response.status === 400) break;
           } catch (e) {
             lastError = e.message || "Network error";
           }
@@ -577,9 +532,7 @@
       btn.textContent = 'Tanya';
     }
 
-    function quickAsk(text) {
-      askBotAI(text);
-    }
+    function quickAsk(text) { askBotAI(text); }
 
     document.getElementById('chat-form').addEventListener('submit', (e) => {
       e.preventDefault();
