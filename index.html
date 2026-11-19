@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gemini Gold M5 v11.00 • Smart 3-Layer Pyramiding</title>
+  <title>Gemini Gold M5 v11.10 • AI Analisa 5m & Smart Pyramiding</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -14,7 +14,7 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-xs">
-          v11
+          v11.1
         </div>
         <div>
           <h1 class="font-bold text-base tracking-tight text-white">Gemini Gold M5 Smart Pyramiding Center</h1>
@@ -41,23 +41,35 @@
 
   <main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
 
-    <!-- Row 1: Status Engine & Daftar Layer Aktif -->
+    <!-- Row 1: Analisa AI 5 Menit, Status Engine & Daftar Layer Aktif -->
     <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-lg space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Status Hybrid AI Regime + Smart 3-Layer Pyramiding</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Analisa Pasar Gemini AI (Setiap 5 Menit) & Smart 3-Layer</span>
         <span class="text-xs text-slate-400" id="heartbeat-text">Update terakhir: -</span>
       </div>
-      <p id="waiting-detail" class="text-base sm:text-lg font-semibold text-white leading-relaxed">
+
+      <!-- Kotak Analisa AI 5 Menit -->
+      <div class="bg-slate-950/90 border border-cyan-500/30 rounded-lg p-3.5">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wide">Analisa Live Gemini AI</span>
+          <span id="regime-pill" class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-800 text-amber-300">WAIT</span>
+        </div>
+        <p id="ai-analysis-box" class="text-sm text-slate-100 leading-relaxed">
+          Menunggu hasil analisa 5-menitan dari Gemini AI...
+        </p>
+      </div>
+
+      <p id="waiting-detail" class="text-xs sm:text-sm font-medium text-slate-300 leading-relaxed">
         Menunggu data masuk dari MetaTrader 5...
       </p>
 
-      <!-- Container Kartu Semua Layer Terbuka (Layer 1, 2, 3) -->
+      <!-- Container Kartu Semua Layer Terbuka -->
       <div id="layers-container" class="hidden space-y-2.5"></div>
 
       <!-- Checklist Visual -->
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-3 border-t border-slate-800/80 text-xs">
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-          <div class="text-slate-400 mb-0.5">1. AI Regime (15m)</div>
+          <div class="text-slate-400 mb-0.5">1. Keputusan AI (5m)</div>
           <div id="chk-gemini" class="font-bold text-slate-200">-</div>
         </div>
         <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
@@ -124,7 +136,7 @@
 
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs mb-3">
           <div class="text-slate-400">
-            Halo! Mesin v11.00 aktif. Ketuk tombol di atas atau ketik pertanyaanmu untuk mengecek regime tren AI, probabilitas menyentuh TP, perkiraan win rate, maupun detail Layer 1–3 yang sedang berjalan.
+            Halo! Mesin v11.10 aktif (Analisa AI tiap 5 menit + Sering Entry M5). Ketuk tombol di atas atau ketik pertanyaanmu di bawah.
           </div>
         </div>
 
@@ -335,7 +347,7 @@
         } else if (d.algo_allowed) {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
           dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping";
-          statusTxt.textContent = "BOT v11.00 AKTIF";
+          statusTxt.textContent = "BOT v11.10 AKTIF";
         } else {
           badge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30";
           dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
@@ -345,6 +357,14 @@
         document.getElementById('header-lot').textContent = Number(d.active_lot || 0.01).toFixed(2);
         document.getElementById('sub-symbol').textContent = `${d.symbol} (${d.timeframe || 'M5'}) • Balance: $${d.balance} • Equity: $${d.equity} • Spread: ${d.spread}`;
         document.getElementById('heartbeat-text').textContent = `Pulse #${d.heartbeat} | Update AI: ${d.gemini_updated}`;
+
+        const pill = document.getElementById('regime-pill');
+        pill.textContent = d.gemini_bias || 'WAIT';
+        if (d.gemini_bias === 'BUY_ONLY') pill.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300";
+        else if (d.gemini_bias === 'SELL_ONLY') pill.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300";
+        else pill.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300";
+
+        document.getElementById('ai-analysis-box').textContent = d.gemini_analysis || d.waiting_detail;
         document.getElementById('waiting-detail').textContent = d.waiting_detail;
         document.getElementById('live-price-tag').textContent = `Bid: ${d.bid}`;
 
@@ -354,7 +374,6 @@
         document.getElementById('chk-quota').textContent = `${d.open_positions} / ${d.max_positions || 3} Layer`;
         document.getElementById('chk-lot').textContent = `Est. WR ${metrics.estWinRate} • Lot ${d.active_lot}`;
 
-        // Render Semua Layer Aktif
         const layersContainer = document.getElementById('layers-container');
         const layers = d.active_layers || [];
         if (layers.length > 0) {
@@ -441,11 +460,10 @@
         ).join('\n') + '\n';
       }
 
-      return `[Analisa Live Gold M5 v11.00]\n` +
+      return `[Analisa Live Gold M5 v11.10]\n` +
              posSection +
-             `• Regime AI (15m): ${d.gemini_bias} (Probabilitas tren: ~${m.trendProb}%)\n` +
+             `• Analisa AI (5m): ${d.gemini_bias} — ${d.gemini_analysis || '-'}\n` +
              `• Peluang Nyampe ke TP (RR >= 1:2): ~${m.tpProb}% | Perkiraan Win Rate: ${m.estWinRate}\n` +
-             `• Status: ${d.waiting_detail}\n` +
              `(Info API: ${apiErrMsg})`;
     }
 
@@ -484,15 +502,15 @@
       }
 
       const liveContext = currentBotData
-        ? `Data Live MT5 v11.00 -> Symbol: ${currentBotData.symbol}, TF: M5, Bid: ${currentBotData.bid}, Ask: ${currentBotData.ask}, Base Lot: ${currentBotData.active_lot}, Regime AI: ${currentBotData.gemini_bias} (Update: ${currentBotData.gemini_updated}), EMA20 M5: ${currentBotData.ema8}, EMA50 M5: ${currentBotData.ema21}, RSI(14) M5: ${currentBotData.rsi}, ATR M5: ${currentBotData.atr_m5}, Estimasi Statistik: Probabilitas Tren ~${m.trendProb}%, Peluang Menyentuh TP ~${m.tpProb}%, Perkiraan Win Rate ${m.estWinRate}, Status Mesin: "${currentBotData.waiting_detail}".\n${posContext}`
+        ? `Data Live MT5 v11.10 -> Symbol: ${currentBotData.symbol}, TF: M5, Bid: ${currentBotData.bid}, Ask: ${currentBotData.ask}, Base Lot: ${currentBotData.active_lot}, Keputusan AI (5m): ${currentBotData.gemini_bias}, Analisa AI Terakhir: "${currentBotData.gemini_analysis}", EMA20 M5: ${currentBotData.ema8}, EMA50 M5: ${currentBotData.ema21}, RSI(14) M5: ${currentBotData.rsi}, ATR M5: ${currentBotData.atr_m5}, Estimasi Statistik: Probabilitas Tren ~${m.trendProb}%, Peluang Menyentuh TP ~${m.tpProb}%, Perkiraan Win Rate ${m.estWinRate}.\n${posContext}`
         : "MT5 belum terhubung ke Firebase saat ini.";
 
       const fullPrompt =
-        `Kamu adalah analis kuantitatif & asisten bot trading Gold (XAUUSD) v11.00 khusus M5 dengan sistem Smart 3-Layer Pyramiding.\n` +
+        `Kamu adalah analis kuantitatif & asisten bot trading Gold (XAUUSD) v11.10 khusus M5 dengan analisa AI tiap 5 menit & Smart 3-Layer Pyramiding.\n` +
         `ATURAN WAJIB JAWABAN:\n` +
-        `1. Selalu sertakan PROBABILITAS (%) arah tren Gold berdasarkan Regime AI dan indikator.\n` +
+        `1. Selalu sertakan PROBABILITAS (%) arah tren Gold berdasarkan analisa 5-menitan AI dan indikator.\n` +
         `2. Selalu berikan estimasi peluang (%) apakah harga akan menyentuh target TP (RR minimal 1:2) beserta perkiraan kisaran WIN RATE-nya.\n` +
-        `3. Jika ada posisi terbuka (baik 1, 2, maupun 3 layer), sebutkan detail masing-masing layer secara jelas: Layer ke berapa, Timeframe (M5), Harga Entry, SL (termasuk jika sudah Break-Even), TP, rasio RR, dan floating profit/loss-nya.\n` +
+        `3. Jika ada posisi terbuka (1, 2, atau 3 layer), sebutkan detail masing-masing layer: Layer ke berapa, Timeframe (M5), Harga Entry, SL, TP, rasio RR, dan floating profit/loss-nya.\n` +
         `4. Jawab dalam Bahasa Indonesia yang ringkas, jelas, dan langsung ke inti.\n\n` +
         `DATA LIVE SISTEM:\n${liveContext}\n\nPertanyaan user: ${question}`;
 
@@ -514,7 +532,7 @@
             if (reply) {
               if (tryIdx !== activeKeyIndex) await saveActiveKeyIndex(tryIdx);
               document.getElementById('key-badge').textContent = `Key #${tryIdx + 1}/${keys.length} Ready`;
-              appendChat(`Bot Gemini v11 (Key #${tryIdx + 1})`, reply, false);
+              appendChat(`Bot Gemini v11.10 (Key #${tryIdx + 1})`, reply, false);
               btn.disabled = false;
               btn.textContent = 'Tanya';
               return;
