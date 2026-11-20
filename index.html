@@ -3,20 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>STARRI • Quantitative Gold M5 Terminal (v11.00)</title>
+  <title>STARRI v11.70 • Dual-Engine Gold AI Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            obsidian: '#090b10',
+            surface: '#11151f',
+            card: '#161b28',
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
           }
         }
       }
@@ -24,680 +33,629 @@
   </script>
   <style>
     body {
-      background-color: #050810;
+      background-color: #090b10;
+      color: #e2e8f0;
       background-image:
-        radial-gradient(circle at 12% 0%, rgba(245, 158, 11, 0.07), transparent 36%),
-        radial-gradient(circle at 88% 8%, rgba(6, 182, 212, 0.06), transparent 34%);
+        radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.06), transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(56, 189, 248, 0.05), transparent 35%);
     }
-    .glass-panel {
-      background: rgba(11, 17, 32, 0.86);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(30, 41, 59, 0.85);
+    .glass-card {
+      background: rgba(22, 27, 40, 0.78);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
     }
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #070b14; }
-    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    .gold-glow {
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.14);
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090b10; }
+    ::-webkit-scrollbar-thumb { background: #262f45; border-radius: 999px; }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen font-sans antialiased selection:bg-amber-500/30 selection:text-amber-200">
+<body class="min-h-screen antialiased selection:bg-amber-500/30 selection:text-amber-200">
 
   <!-- TOP NAVIGATION BAR -->
-  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-[#080d1a]/90 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-      
-      <!-- Brand Identity: STARRI -->
-      <div class="flex items-center gap-3.5">
-        <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400/25 via-amber-500/15 to-slate-900 border border-amber-400/40 flex items-center justify-center shadow-lg shadow-amber-500/5">
-          <svg class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L14.8 8.8L22 9.3L16.5 14L18.2 21L12 17.3L5.8 21L7.5 14L2 9.3L9.2 8.8L12 2Z" />
-          </svg>
+  <header class="sticky top-0 z-30 border-b border-white/10 bg-obsidian/85 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-obsidian font-bold text-lg shadow-lg shadow-amber-500/20">
+          S
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <span class="font-extrabold text-base sm:text-lg tracking-wider bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
-              STARRI
-            </span>
-            <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/25">
-              QUANT v11.00
-            </span>
-            <span class="hidden md:inline-block text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800/90 text-slate-300 border border-slate-700/70">
-              XAUUSD • M5
-            </span>
+            <h1 class="font-bold text-base sm:text-lg tracking-tight text-white">STARRI <span class="text-amber-400">QUANT GOLD</span></h1>
+            <span class="px-2 py-0.5 text-[11px] font-mono font-semibold rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30">v11.70</span>
           </div>
-          <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5" id="sub-symbol">Menghubungkan STARRI Engine ke Firebase...</p>
+          <p class="text-xs text-slate-400">Dual-Engine Architecture • Trend Core & Scalp Bounce</p>
         </div>
       </div>
 
-      <!-- Action Controls & Live Telemetry Badge -->
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="addNewApiKeyToPool()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/80 hover:bg-slate-800 text-cyan-300 border border-slate-700/80 hover:border-cyan-500/40 transition">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          API Key
-        </button>
+      <!-- LIVE CONNECTION & PRICE PILL -->
+      <div class="flex items-center gap-3 sm:gap-5">
+        <div class="hidden md:flex items-center gap-4 px-3.5 py-1.5 rounded-xl bg-surface border border-white/5 font-mono text-xs">
+          <div>
+            <span class="text-slate-400">BID</span>
+            <span id="hdr-bid" class="ml-1.5 font-semibold text-white">---.--</span>
+          </div>
+          <span class="text-white/10">|</span>
+          <div>
+            <span class="text-slate-400">ASK</span>
+            <span id="hdr-ask" class="ml-1.5 font-semibold text-white">---.--</span>
+          </div>
+          <span class="text-white/10">|</span>
+          <div>
+            <span class="text-slate-400">SPREAD</span>
+            <span id="hdr-spread" class="ml-1.5 font-semibold text-amber-400">-- pt</span>
+          </div>
+        </div>
 
-        <button onclick="changeLotSize()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition">
-          <span>Base Lot:</span>
-          <span id="header-lot" class="font-mono font-bold text-amber-400">0.01</span>
-          <svg class="w-3 h-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-        </button>
-
-        <div id="status-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/25">
-          <span id="status-dot" class="w-2 h-2 rounded-full bg-rose-500"></span>
-          <span id="status-text">OFFLINE</span>
+        <div id="conn-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-white/10 text-xs font-medium">
+          <span id="conn-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+          <span id="conn-text" class="text-slate-300">Menghubungkan...</span>
         </div>
       </div>
-
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
-    <!-- ROW 1: 4 KARTU METRIK UTAMA (KPI CARDS) -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      <!-- Card 1: Account Balance & Equity -->
-      <div class="glass-panel rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between text-[11px] font-medium text-slate-400 mb-1.5">
-          <span>Balance & Equity</span>
-          <span id="spread-pill" class="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-800/90 text-slate-300 border border-slate-700/60">Spread: -</span>
-        </div>
-        <div class="font-mono text-lg sm:text-2xl font-bold text-white tracking-tight" id="kpi-balance">$0.00</div>
-        <div class="font-mono text-xs text-slate-400 mt-1">Equity: <span id="kpi-equity" class="text-slate-200 font-semibold">$0.00</span></div>
-      </div>
-
-      <!-- Card 2: AI Market Regime -->
-      <div class="glass-panel rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between text-[11px] font-medium text-slate-400 mb-1.5">
-          <span>STARRI AI Regime</span>
-          <span id="kpi-prob" class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/25">Prob -%</span>
-        </div>
-        <div class="text-lg sm:text-2xl font-extrabold tracking-tight" id="kpi-regime">WAIT</div>
-        <div class="text-[11px] text-slate-400 mt-1 truncate" id="kpi-ai-time">Sync AI: -</div>
-      </div>
-
-      <!-- Card 3: Smart 3-Layer Pyramiding -->
-      <div class="glass-panel rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between text-[11px] font-medium text-slate-400 mb-1.5">
-          <span>Pyramiding Layers</span>
-          <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/25">RR &ge; 1:2</span>
-        </div>
-        <div class="flex items-baseline gap-2.5">
-          <span class="font-mono text-lg sm:text-2xl font-bold text-white" id="kpi-layers">0 / 3</span>
-          <span class="font-mono text-xs sm:text-sm font-bold" id="kpi-floating">$0.00</span>
-        </div>
-        <div class="text-[11px] text-slate-400 mt-1 truncate" id="kpi-layer-status">Memindai pullback EMA 20</div>
-      </div>
-
-      <!-- Card 4: Win Rate & Multi-Key Pool -->
-      <div class="glass-panel rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between text-[11px] font-medium text-slate-400 mb-1.5">
-          <span>Est. Win Rate</span>
-          <span id="key-badge" class="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Sync...</span>
-        </div>
-        <div class="font-mono text-lg sm:text-2xl font-bold text-emerald-400 tracking-tight" id="kpi-winrate">-</div>
-        <div class="text-[11px] text-slate-400 mt-1 truncate" id="kpi-trades">Closed: 0 • Peluang TP: -%</div>
-      </div>
-    </section>
-
-    <!-- ROW 2: ENGINE TELEMETRY BAR & ACTIVE PYRAMIDING LAYERS -->
-    <section class="glass-panel rounded-2xl p-4 sm:p-5 space-y-4 shadow-sm">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
-        <div class="flex items-start sm:items-center gap-2.5">
-          <span class="mt-1.5 sm:mt-0 w-2 h-2 rounded-full bg-amber-400 shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.8)]"></span>
-          <p id="waiting-detail" class="text-xs sm:text-sm font-medium text-slate-200 leading-relaxed">
-            Menunggu aliran data telemetri dari MetaTrader 5...
+    <!-- DUAL-ENGINE HERO BANNER & AI DIAGNOSTICS -->
+    <section class="glass-card gold-glow rounded-2xl p-5 sm:p-6">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div class="space-y-2 max-w-2xl">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span id="regime-pill" class="px-3 py-1 rounded-lg text-xs font-mono font-bold tracking-wider uppercase bg-slate-800 text-slate-300 border border-white/10">
+              REGIME: INIT
+            </span>
+            <span id="engine-gear-pill" class="px-3 py-1 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">
+              Memuat Status Mesin...
+            </span>
+            <span id="gemini-time" class="text-xs font-mono text-slate-400">AI Update: -</span>
+          </div>
+          <p id="waiting-detail" class="text-sm sm:text-base text-slate-200 leading-relaxed">
+            Menunggu telemetri dari MetaTrader 5 (STARRI v11.70)...
           </p>
         </div>
-        <span class="font-mono text-[11px] text-slate-400 shrink-0 bg-slate-900/90 px-2.5 py-1 rounded-md border border-slate-800" id="heartbeat-text">
-          Pulse: -
-        </span>
-      </div>
 
-      <!-- Technical Matrix Strip -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-        <div class="bg-[#070b14] px-3.5 py-2.5 rounded-xl border border-slate-800/90 flex items-center justify-between">
-          <span class="text-slate-400">EMA 20 / 50</span>
-          <span id="chk-ema" class="font-mono font-semibold text-slate-200">-</span>
-        </div>
-        <div class="bg-[#070b14] px-3.5 py-2.5 rounded-xl border border-slate-800/90 flex items-center justify-between">
-          <span class="text-slate-400">RSI(14) M5</span>
-          <span id="chk-rsi" class="font-mono font-semibold text-slate-200">-</span>
-        </div>
-        <div class="bg-[#070b14] px-3.5 py-2.5 rounded-xl border border-slate-800/90 flex items-center justify-between">
-          <span class="text-slate-400">ATR(14) M5</span>
-          <span id="chk-atr" class="font-mono font-semibold text-slate-200">-</span>
-        </div>
-        <div class="bg-[#070b14] px-3.5 py-2.5 rounded-xl border border-slate-800/90 flex items-center justify-between">
-          <span class="text-slate-400">Range H / L</span>
-          <span id="chk-hl" class="font-mono font-semibold text-slate-200">-</span>
+        <!-- DUAL-ENGINE VISUAL SWITCHER -->
+        <div class="grid grid-cols-2 gap-3 shrink-0">
+          <div id="gear-trend-box" class="p-3.5 rounded-xl border border-white/10 bg-surface/90 transition-all">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Gigi 1 • Trend Core</span>
+              <span id="gear-trend-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
+            </div>
+            <div class="text-sm font-bold text-white">3-Layer Pyramid</div>
+            <div class="text-[11px] text-slate-400 font-mono mt-0.5">RR 1:2.2 – 3.0 • BE 1.4x</div>
+          </div>
+
+          <div id="gear-bounce-box" class="p-3.5 rounded-xl border border-white/10 bg-surface/90 transition-all">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Gigi 2 • Scalp Bounce</span>
+              <span id="gear-bounce-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
+            </div>
+            <div class="text-sm font-bold text-white">1-Layer Taktis</div>
+            <div class="text-[11px] text-slate-400 font-mono mt-0.5">RR 1:1.6 • Fast BE 1.0x</div>
+          </div>
         </div>
       </div>
-
-      <!-- Dynamic Grid for Active Layers (1 to 3) -->
-      <div id="layers-container" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3 pt-1"></div>
     </section>
 
-    <!-- ROW 3: LIVE M5 CHART & STARRI AI QUANT ASSISTANT -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <!-- 4 KPI METRIC CARDS -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="glass-card rounded-2xl p-4 sm:p-5">
+        <div class="text-xs font-medium text-slate-400 mb-1">Saldo & Ekuitas</div>
+        <div id="kpi-balance" class="text-xl sm:text-2xl font-mono font-bold text-white">$0.00</div>
+        <div class="flex items-center justify-between mt-2 text-xs font-mono">
+          <span class="text-slate-400">Equity:</span>
+          <span id="kpi-equity" class="text-emerald-400 font-semibold">$0.00</span>
+        </div>
+      </div>
 
-      <!-- Left: Interactive Candlestick & Level Chart -->
-      <section class="lg:col-span-8 glass-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-3.5">
+      <div class="glass-card rounded-2xl p-4 sm:p-5">
+        <div class="text-xs font-medium text-slate-400 mb-1">Layer Aktif</div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpi-layers" class="text-xl sm:text-2xl font-mono font-bold text-amber-400">0 / 3</span>
+          <span id="kpi-lot-badge" class="text-xs font-mono px-2 py-0.5 rounded bg-white/5 text-slate-300">Lot 0.01</span>
+        </div>
+        <div class="flex items-center justify-between mt-2 text-xs font-mono">
+          <span class="text-slate-400">Floating P/L:</span>
+          <span id="kpi-floating" class="text-slate-200 font-semibold">$0.00</span>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 sm:p-5">
+        <div class="text-xs font-medium text-slate-400 mb-1">Win Rate & Total Trade</div>
+        <div id="kpi-winrate" class="text-xl sm:text-2xl font-mono font-bold text-emerald-400">0.0%</div>
+        <div class="flex items-center justify-between mt-2 text-xs font-mono">
+          <span class="text-slate-400">Closed Deals:</span>
+          <span id="kpi-trades" class="text-slate-200 font-semibold">0</span>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 sm:p-5">
+        <div class="text-xs font-medium text-slate-400 mb-1">Indikator M5 & API Pool</div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-sm font-mono text-slate-400">RSI</span>
+          <span id="kpi-rsi" class="text-xl sm:text-2xl font-mono font-bold text-sky-400">50.0</span>
+        </div>
+        <div class="flex items-center justify-between mt-2 text-xs font-mono">
+          <span class="text-slate-400">Active Key:</span>
+          <span id="kpi-apikey" class="text-amber-300 font-semibold">#1 / 1</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN WORKSPACE: CHART + REMOTE CONTROL -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- LIVE M5 PRICE & EMA CHART (2 COLS) -->
+      <div class="lg:col-span-2 glass-card rounded-2xl p-5 flex flex-col justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
           <div>
-            <h2 class="font-bold text-sm sm:text-base text-white">STARRI Live Chart • XAUUSD (M5)</h2>
-            <p class="text-[11px] text-slate-400 mt-0.5">Garis Hijau = Target TP Layer • Garis Merah = Stop Loss / Break-Even</p>
-          </div>
-          <div class="flex items-center gap-3 text-xs font-mono">
-            <span class="inline-flex items-center gap-1.5 text-cyan-400"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>EMA20</span>
-            <span class="inline-flex items-center gap-1.5 text-amber-400"><span class="w-2 h-2 rounded-full bg-amber-400"></span>EMA50</span>
-            <span id="live-price-tag" class="bg-slate-900 border border-slate-700/80 px-3 py-1 rounded-lg text-white font-bold shadow-inner">Bid: -</span>
-          </div>
-        </div>
-
-        <div id="tv-chart" class="w-full h-[400px] rounded-xl overflow-hidden border border-slate-800/90 bg-[#050810]"></div>
-
-        <div class="flex flex-wrap items-center justify-between gap-2 mt-3.5 pt-3 border-t border-slate-800/70 text-[11px] text-slate-400">
-          <span id="slot-M5" class="font-semibold text-slate-300">Status Mesin: Menunggu sinyal...</span>
-          <span class="font-mono text-amber-400/90">Auto Break-Even @ 1:1 • Smart TP Extension</span>
-        </div>
-      </section>
-
-      <!-- Right: STARRI AI Quant Assistant -->
-      <section class="lg:col-span-4 glass-panel rounded-2xl p-4 sm:p-5 flex flex-col h-[525px] shadow-sm">
-        <div class="pb-3 border-b border-slate-800/80">
-          <div class="flex items-center justify-between">
-            <h2 class="font-bold text-sm sm:text-base text-white flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-              STARRI AI Assistant
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              XAUUSD • M5 Live Structure & EMA Dynamic
             </h2>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/60">Multi-Key</span>
+            <p class="text-xs text-slate-400 font-mono mt-0.5">
+              ATR(14): <span id="chart-atr" class="text-slate-200">-</span> •
+              Trigger Buy: <span id="chart-tbuy" class="text-emerald-400">-</span> •
+              Trigger Sell: <span id="chart-tsell" class="text-rose-400">-</span>
+            </p>
           </div>
-          <p class="text-[11px] text-slate-400 mt-1">Tanyakan probabilitas tren, estimasi win rate & detail setiap layer aktif.</p>
-
-          <!-- Quick Prompt Actions -->
-          <div class="flex flex-wrap gap-1.5 mt-3">
-            <button onclick="quickAsk('Analisa arah tren Gold sekarang, berapa persen probabilitasnya, dan kira-kira nyampe ke TP ga? Kasih perkiraan win rate juga.')" class="text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700/80 transition">
-              Probabilitas Tren & TP
-            </button>
-            <button onclick="quickAsk('Cek semua layer posisi yang lagi kebuka sekarang! Jelaskan Entry, SL, TP, dan TF masing-masing layer serta peluang tambah layer berikutnya.')" class="text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700/80 transition">
-              Detail Layer Aktif
-            </button>
+          <div class="flex items-center gap-3 text-[11px] font-mono">
+            <span class="flex items-center gap-1.5 text-amber-300"><span class="w-2.5 h-0.5 bg-amber-400 inline-block"></span>Close</span>
+            <span class="flex items-center gap-1.5 text-sky-400"><span class="w-2.5 h-0.5 bg-sky-400 inline-block"></span>EMA 20</span>
+            <span class="flex items-center gap-1.5 text-purple-400"><span class="w-2.5 h-0.5 bg-purple-400 inline-block"></span>EMA 50</span>
           </div>
         </div>
 
-        <!-- Chat History -->
-        <div id="chat-box" class="flex-1 overflow-y-auto space-y-2.5 py-3 pr-1 text-xs">
-          <div class="bg-[#070b14] border border-slate-800/90 text-slate-300 p-3.5 rounded-xl leading-relaxed">
-            Selamat datang di <strong class="text-amber-400">STARRI v11.00</strong>. Ketuk tombol cepat di atas atau tulis pertanyaan untuk mengecek probabilitas tren, peluang menyentuh TP, dan status setiap layer.
+        <div class="relative h-72 sm:h-80 w-full">
+          <canvas id="goldChart"></canvas>
+        </div>
+      </div>
+
+      <!-- REMOTE CONTROL PANEL (FIREBASE SYNC) -->
+      <div class="glass-card rounded-2xl p-5 space-y-5">
+        <div class="border-b border-white/10 pb-3">
+          <h2 class="text-sm font-bold text-white">Kontrol Remote STARRI</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Perubahan otomatis terkirim ke MT5 dalam 2 detik</p>
+        </div>
+
+        <!-- 1. BASE LOT CONTROL -->
+        <div class="space-y-2">
+          <label class="text-xs font-medium text-slate-300 flex justify-between">
+            <span>Base Lot (Layer 1)</span>
+            <span id="lot-sync-status" class="font-mono text-[11px] text-emerald-400">Tersinkron</span>
+          </label>
+          <div class="flex gap-2">
+            <input id="input-lot" type="number" step="0.01" min="0.01" max="0.50" value="0.01"
+              class="w-full px-3.5 py-2 rounded-xl bg-obsidian border border-white/10 font-mono text-sm text-white focus:outline-none focus:border-amber-400" />
+            <button onclick="updateLotSize()"
+              class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-obsidian font-semibold text-xs transition shrink-0">
+              Simpan Lot
+            </button>
+          </div>
+          <div class="flex gap-1.5 pt-1">
+            <button onclick="quickLot(0.01)" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 font-mono text-[11px] text-slate-300">0.01</button>
+            <button onclick="quickLot(0.02)" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 font-mono text-[11px] text-slate-300">0.02</button>
+            <button onclick="quickLot(0.05)" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 font-mono text-[11px] text-slate-300">0.05</button>
+            <button onclick="quickLot(0.10)" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 font-mono text-[11px] text-slate-300">0.10</button>
           </div>
         </div>
 
-        <!-- Chat Input -->
-        <form id="chat-form" class="pt-3 border-t border-slate-800/80 flex gap-2">
-          <input id="chat-input" type="text" placeholder="Tanya tren, peluang TP, atau layer..." class="flex-1 bg-[#070b14] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500/70 transition" required />
-          <button type="submit" id="send-btn" class="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 shadow-md shadow-amber-500/10">
-            Kirim
+        <!-- 2. MANUAL NEWS PAUSE GUARD -->
+        <div class="p-3.5 rounded-xl bg-surface border border-white/10 flex items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-semibold text-white">Manual News Pause</div>
+            <div class="text-[11px] text-slate-400">Tahan entry baru saat volatilitas ekstrem</div>
+          </div>
+          <button id="btn-news-pause" onclick="toggleNewsPause()"
+            class="px-3.5 py-1.5 rounded-lg font-mono text-xs font-semibold bg-slate-800 text-slate-300 border border-white/10 transition">
+            OFF
           </button>
-        </form>
-      </section>
+        </div>
 
-    </div>
+        <!-- 3. GEMINI API KEY ROTATION POOL -->
+        <div class="space-y-2.5 pt-1 border-t border-white/10">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-white">Pool API Key Gemini</span>
+            <span id="pool-count-badge" class="text-[11px] font-mono text-amber-400">0 Keys</span>
+          </div>
+
+          <div class="flex gap-2">
+            <input id="input-new-key" type="password" placeholder="AIzaSy..."
+              class="w-full px-3 py-2 rounded-xl bg-obsidian border border-white/10 font-mono text-xs text-white focus:outline-none focus:border-amber-400" />
+            <button onclick="addApiKey()"
+              class="px-3.5 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 font-semibold text-xs transition shrink-0">
+              + Key
+            </button>
+          </div>
+
+          <div id="api-key-list" class="max-h-28 overflow-y-auto space-y-1.5 pr-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTIVE LAYERS TABLE -->
+    <section class="glass-card rounded-2xl p-5">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <div>
+          <h2 class="text-sm font-bold text-white">Posisi Terbuka & Layer Pyramiding</h2>
+          <p class="text-xs text-slate-400">Swing SL (300–650 pt) • Auto Break-Even & Dynamic TP</p>
+        </div>
+        <span id="last-heartbeat" class="text-xs font-mono text-slate-400">Heartbeat: #0</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-white/10 text-[11px] font-mono uppercase text-slate-400">
+              <th class="py-2.5 px-3">Layer</th>
+              <th class="py-2.5 px-3">Engine</th>
+              <th class="py-2.5 px-3">Tipe</th>
+              <th class="py-2.5 px-3">Lot</th>
+              <th class="py-2.5 px-3">Entry</th>
+              <th class="py-2.5 px-3">Stop Loss</th>
+              <th class="py-2.5 px-3">Take Profit</th>
+              <th class="py-2.5 px-3">Target RR</th>
+              <th class="py-2.5 px-3 text-right">Floating P/L</th>
+            </tr>
+          </thead>
+          <tbody id="layers-tbody" class="divide-y divide-white/5 text-xs font-mono">
+            <tr>
+              <td colspan="9" class="py-8 text-center text-slate-500 font-sans">
+                Belum ada posisi aktif. Mesin memindai struktur M5...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
   </main>
 
-  <!-- FOOTER -->
-  <footer class="max-w-7xl mx-auto px-4 sm:px-6 py-4 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500 border-t border-slate-900 mt-4">
-    <span>STARRI Quantitative Trading Workstation • XAUUSD M5 Engine v11.00</span>
-    <span class="font-mono">Firebase Realtime Sync • Smart 3-Layer Pyramiding</span>
-  </footer>
-
   <script>
-    const FIREBASE_BASE   = "https://gold-2904d-default-rtdb.asia-southeast1.firebasedatabase.app";
-    const FIREBASE_STATUS = `${FIREBASE_BASE}/bot_status.json`;
-    const FIREBASE_CONFIG = `${FIREBASE_BASE}/config.json`;
-    const FIREBASE_LOT    = `${FIREBASE_BASE}/config/lot_size.json`;
-    const GEMINI_MODELS   = ["gemini-flash-lite-latest", "gemini-flash-latest"];
+    const FIREBASE_URL = "https://gold-2904d-default-rtdb.asia-southeast1.firebasedatabase.app";
+    let goldChart = null;
+    let currentConfig = { lot_size: 0.01, news_pause: false, api_keys: [], active_key_index: 0 };
+    let lastHeartbeat = -1;
+    let staleCounter = 0;
 
-    let currentBotData = null;
-    let keyPool = [];
-    let activeKeyIndex = 0;
-    let lastSeenHeartbeat = null;
-    let lastHeartbeatChangeMs = 0;
-
-    async function loadConfigFromFirebase() {
-      const badge = document.getElementById('key-badge');
-      try {
-        const res = await fetch(`${FIREBASE_CONFIG}?t=${Date.now()}`);
-        const cfg = await res.json();
-        const pool = [];
-
-        if (cfg && cfg.api_keys) {
-          const vals = Array.isArray(cfg.api_keys) ? cfg.api_keys : Object.values(cfg.api_keys);
-          vals.forEach(k => {
-            if (typeof k === 'string' && k.trim().length > 15 && !pool.includes(k.trim())) {
-              pool.push(k.trim());
+    // Initialize Chart.js
+    function initChart() {
+      const ctx = document.getElementById('goldChart').getContext('2d');
+      goldChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Close M5',
+              data: [],
+              borderColor: '#fbbf24',
+              backgroundColor: 'rgba(251, 191, 36, 0.08)',
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.25,
+              fill: true
+            },
+            {
+              label: 'EMA 20',
+              data: [],
+              borderColor: '#38bdf8',
+              borderWidth: 1.6,
+              pointRadius: 0,
+              tension: 0.3
+            },
+            {
+              label: 'EMA 50',
+              data: [],
+              borderColor: '#c084fc',
+              borderWidth: 1.6,
+              borderDash: [4, 4],
+              pointRadius: 0,
+              tension: 0.3
             }
-          });
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#11151f',
+              borderColor: 'rgba(255,255,255,0.12)',
+              borderWidth: 1,
+              titleFont: { family: 'JetBrains Mono', size: 11 },
+              bodyFont: { family: 'JetBrains Mono', size: 11 }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 }, maxTicksLimit: 8 }
+            },
+            y: {
+              position: 'right',
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }
+            }
+          }
         }
-        if (cfg && typeof cfg.api_key === 'string' && cfg.api_key.trim().length > 15) {
-          const single = cfg.api_key.trim();
-          if (!pool.includes(single)) pool.push(single);
-        }
-
-        keyPool = pool;
-        if (cfg && typeof cfg.active_key_index === 'number' && cfg.active_key_index >= 0 && cfg.active_key_index < keyPool.length) {
-          activeKeyIndex = cfg.active_key_index;
-        } else if (activeKeyIndex >= keyPool.length) {
-          activeKeyIndex = 0;
-        }
-
-        if (keyPool.length > 0) {
-          badge.textContent = `Key #${activeKeyIndex + 1}/${keyPool.length}`;
-          badge.className = "font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25";
-          return keyPool;
-        }
-      } catch (e) {}
-      badge.textContent = "No Key";
-      badge.className = "font-mono text-[10px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/25";
-      return [];
+      });
     }
 
-    async function saveActiveKeyIndex(newIdx) {
-      activeKeyIndex = newIdx;
+    // Fetch Telemetry & Config from Firebase
+    async function pollFirebase() {
       try {
-        await fetch(`${FIREBASE_BASE}/config/active_key_index.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newIdx)
-        });
-      } catch (e) {}
-    }
+        const [statusRes, cfgRes] = await Promise.all([
+          fetch(`${FIREBASE_URL}/bot_status.json`),
+          fetch(`${FIREBASE_URL}/config.json`)
+        ]);
 
-    async function addNewApiKeyToPool() {
-      const newKey = prompt("Tempel API Key Gemini baru untuk ditambahkan ke antrean rotasi STARRI:");
-      if (!newKey || newKey.trim().length < 15) return;
-      const cleanKey = newKey.trim();
+        if (statusRes.ok) {
+          const data = await statusRes.json();
+          if (data) renderBotStatus(data);
+        }
 
-      await loadConfigFromFirebase();
-      if (keyPool.includes(cleanKey)) {
-        alert("API Key ini sudah terdaftar di Firebase.");
-        return;
-      }
-      keyPool.push(cleanKey);
-      const objMap = {};
-      keyPool.forEach((k, idx) => { objMap[String(idx)] = k; });
-
-      try {
-        await fetch(`${FIREBASE_BASE}/config/api_keys.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(objMap)
-        });
-        await loadConfigFromFirebase();
-        appendChat("STARRI System", `API Key #${keyPool.length} berhasil ditambahkan ke pool rotasi.`, false);
-      } catch (e) {
-        alert("Gagal menyimpan API Key ke Firebase.");
+        if (cfgRes.ok) {
+          const cfg = await cfgRes.json();
+          if (cfg) renderConfig(cfg);
+        }
+      } catch (err) {
+        setConnectionState(false, "Gagal terhubung ke Firebase");
       }
     }
 
-    async function changeLotSize() {
-      const currentLot = currentBotData ? currentBotData.active_lot : 0.01;
-      const input = prompt("Masukkan Base Lot Layer 1 baru untuk STARRI MT5 (contoh: 0.01, 0.02, 0.03):", currentLot);
-      if (!input) return;
-      const parsed = parseFloat(input.replace(',', '.'));
-      if (isNaN(parsed) || parsed < 0.01 || parsed > 10) {
-        alert("Ukuran lot tidak valid.");
-        return;
-      }
-      try {
-        await fetch(FIREBASE_LOT, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(Number(parsed.toFixed(2)))
-        });
-        document.getElementById('header-lot').textContent = parsed.toFixed(2);
-        appendChat("STARRI System", `Base Lot diubah menjadi ${parsed.toFixed(2)}. MT5 otomatis menyinkronkan dalam 2 detik.`, false);
-      } catch (e) {
-        alert("Gagal menyimpan Lot ke Firebase.");
+    function setConnectionState(online, label) {
+      const dot = document.getElementById('conn-dot');
+      const txt = document.getElementById('conn-text');
+      txt.textContent = label;
+      if (online) {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping";
+        txt.className = "text-emerald-300 font-semibold";
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-rose-500";
+        txt.className = "text-rose-300";
       }
     }
 
-    function computeProbabilityMetrics(d) {
-      if (!d) return { trendProb: 55, tpProb: 48, estWinRate: "48% - 55%" };
-      const isBuy = d.gemini_bias === "BUY_ONLY";
-      const isSell = d.gemini_bias === "SELL_ONLY";
-      const trendAligned = (isBuy && d.ema8 > d.ema21) || (isSell && d.ema8 < d.ema21);
-      const rsiHealthy   = (isBuy && d.rsi > 48 && d.rsi < 72) || (isSell && d.rsi < 52 && d.rsi > 28);
-
-      let trendProb = (isBuy || isSell) ? 62 : 50;
-      if (trendAligned) trendProb += 10;
-      if (rsiHealthy)   trendProb += 6;
-
-      let tpProb = trendAligned ? 56 : 46;
-      const layers = d.active_layers || [];
-      if (layers.length > 0) {
-        const p = layers[0];
-        const totalDist = Math.abs(p.tp - p.entry);
-        const remDist   = p.type === "BUY" ? Math.max(0, p.tp - d.bid) : Math.max(0, d.ask - p.tp);
-        const progress  = totalDist > 0 ? Math.max(0, Math.min(1, (totalDist - remDist) / totalDist)) : 0;
-        tpProb = Math.min(88, Math.max(28, Math.round(tpProb + (progress * 32))));
+    function renderBotStatus(d) {
+      // Heartbeat liveness check
+      if (d.heartbeat === lastHeartbeat) {
+        staleCounter++;
+      } else {
+        staleCounter = 0;
+        lastHeartbeat = d.heartbeat;
       }
 
-      const wrLow  = Math.max(42, tpProb - 4);
-      const wrHigh = Math.min(85, tpProb + 6);
-      return {
-        trendProb: Math.min(86, trendProb),
-        tpProb: tpProb,
-        estWinRate: `${wrLow}% - ${wrHigh}%`
+      const isOnline = staleCounter < 5 && d.algo_allowed;
+      setConnectionState(
+        isOnline,
+        !d.algo_allowed ? "Algo MT5 OFF" : (isOnline ? `LIVE • v${d.version || '11.70'}` : "MT5 Standby / Offline")
+      );
+
+      const digits = d.digits || 2;
+      document.getElementById('hdr-bid').textContent = Number(d.bid || 0).toFixed(digits);
+      document.getElementById('hdr-ask').textContent = Number(d.ask || 0).toFixed(digits);
+      document.getElementById('hdr-spread').textContent = `${d.spread || 0} pt`;
+      document.getElementById('last-heartbeat').textContent = `Heartbeat: #${d.heartbeat || 0}`;
+
+      // Regime & Dual-Engine Visuals
+      const bias = d.gemini_bias || "WAIT";
+      const regimePill = document.getElementById('regime-pill');
+      const gearPill = document.getElementById('engine-gear-pill');
+      const trendBox = document.getElementById('gear-trend-box');
+      const bounceBox = document.getElementById('gear-bounce-box');
+      const trendDot = document.getElementById('gear-trend-dot');
+      const bounceDot = document.getElementById('gear-bounce-dot');
+
+      regimePill.textContent = `REGIME: ${bias}`;
+      trendBox.className = "p-3.5 rounded-xl border border-white/10 bg-surface/90 transition-all opacity-60";
+      bounceBox.className = "p-3.5 rounded-xl border border-white/10 bg-surface/90 transition-all opacity-60";
+      trendDot.className = "w-2 h-2 rounded-full bg-slate-600";
+      bounceDot.className = "w-2 h-2 rounded-full bg-slate-600";
+
+      if (bias === "BUY_ONLY" || bias === "SELL_ONLY") {
+        regimePill.className = bias === "BUY_ONLY"
+          ? "px-3 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+          : "px-3 py-1 rounded-lg text-xs font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40";
+        gearPill.textContent = "GIGI 1 AKTIF • TREND CORE (3-LAYER)";
+        gearPill.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40";
+        trendBox.className = "p-3.5 rounded-xl border border-amber-400/50 bg-amber-500/10 transition-all shadow-lg shadow-amber-500/10";
+        trendDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+      } else if (bias === "COUNTER_BUY" || bias === "COUNTER_SELL") {
+        regimePill.className = "px-3 py-1 rounded-lg text-xs font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40";
+        gearPill.textContent = "GIGI 2 AKTIF • SCALP BOUNCE (1-LAYER)";
+        gearPill.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40";
+        bounceBox.className = "p-3.5 rounded-xl border border-sky-400/50 bg-sky-500/10 transition-all shadow-lg shadow-sky-500/10";
+        bounceDot.className = "w-2 h-2 rounded-full bg-sky-400 animate-pulse";
+      } else {
+        regimePill.className = "px-3 py-1 rounded-lg text-xs font-mono font-bold bg-slate-800 text-amber-200 border border-white/15";
+        gearPill.textContent = bias === "NEWS_PAUSE" ? "GUARD: NEWS PAUSE" : (bias === "WEEKEND_CLOSE" ? "GUARD: WEEKEND CLOSE" : "STANDBY • MENUNGGU STRUKTUR");
+        gearPill.className = "px-3 py-1 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 border border-white/10";
+      }
+
+      document.getElementById('gemini-time').textContent = `AI Update: ${d.gemini_updated || '-'}`;
+      document.getElementById('waiting-detail').textContent = d.waiting_detail || "Memindai pergerakan XAUUSD...";
+
+      // KPIs
+      document.getElementById('kpi-balance').textContent = `$${Number(d.balance || 0).toFixed(2)}`;
+      document.getElementById('kpi-equity').textContent = `$${Number(d.equity || 0).toFixed(2)}`;
+      document.getElementById('kpi-layers').textContent = `${d.open_positions || 0} / ${d.max_positions || 3}`;
+      document.getElementById('kpi-lot-badge').textContent = `Lot ${Number(d.active_lot || 0.01).toFixed(2)}`;
+      document.getElementById('kpi-winrate').textContent = `${Number(d.win_rate || 0).toFixed(1)}%`;
+      document.getElementById('kpi-trades').textContent = d.total_trades || 0;
+      document.getElementById('kpi-rsi').textContent = Number(d.rsi || 50).toFixed(1);
+      document.getElementById('kpi-apikey').textContent = `#${(d.active_key_index || 0) + 1} / ${Math.max(1, d.total_keys || 1)}`;
+
+      document.getElementById('chart-atr').textContent = Number(d.atr_m5 || 0).toFixed(digits);
+      document.getElementById('chart-tbuy').textContent = Number(d.trigger_buy || 0).toFixed(digits);
+      document.getElementById('chart-tsell').textContent = Number(d.trigger_sell || 0).toFixed(digits);
+
+      // Update Chart
+      if (Array.isArray(d.candles) && d.candles.length > 0 && goldChart) {
+        goldChart.data.labels = d.candles.map(c => {
+          const dt = new Date(c.time * 1000);
+          return dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        });
+        goldChart.data.datasets[0].data = d.candles.map(c => Number(c.close));
+        goldChart.data.datasets[1].data = d.candles.map(c => Number(c.ema8));
+        goldChart.data.datasets[2].data = d.candles.map(c => Number(c.ema21));
+        goldChart.update('none');
+      }
+
+      // Render Active Layers Table
+      const layers = Array.isArray(d.active_layers) ? d.active_layers : [];
+      const tbody = document.getElementById('layers-tbody');
+      let totalFloating = 0;
+
+      if (layers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500 font-sans">Belum ada posisi aktif. Mesin memindai struktur M5...</td></tr>`;
+      } else {
+        tbody.innerHTML = layers.map(l => {
+          const pnl = Number(l.profit || 0);
+          totalFloating += pnl;
+          const isBounce = Number(l.rr) <= 1.7;
+          const typeBadge = l.type === 'BUY'
+            ? `<span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-bold">BUY</span>`
+            : `<span class="px-2 py-0.5 rounded bg-rose-500/15 text-rose-400 font-bold">SELL</span>`;
+          const engineBadge = isBounce
+            ? `<span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-[11px]">SCALP BOUNCE</span>`
+            : `<span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 text-[11px]">TREND CORE</span>`;
+
+          return `
+            <tr class="hover:bg-white/[0.02] transition">
+              <td class="py-3 px-3 font-bold text-white">#${l.layer}</td>
+              <td class="py-3 px-3">${engineBadge}</td>
+              <td class="py-3 px-3">${typeBadge}</td>
+              <td class="py-3 px-3 text-slate-200">${Number(l.lot).toFixed(2)}</td>
+              <td class="py-3 px-3 text-white">${Number(l.entry).toFixed(digits)}</td>
+              <td class="py-3 px-3 text-rose-300">${Number(l.sl).toFixed(digits)}</td>
+              <td class="py-3 px-3 text-emerald-300">${Number(l.tp).toFixed(digits)}</td>
+              <td class="py-3 px-3 text-amber-300">1:${Number(l.rr).toFixed(1)}</td>
+              <td class="py-3 px-3 text-right font-bold ${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                ${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const floatEl = document.getElementById('kpi-floating');
+      floatEl.textContent = `${totalFloating >= 0 ? '+' : ''}$${totalFloating.toFixed(2)}`;
+      floatEl.className = `font-semibold ${totalFloating > 0 ? 'text-emerald-400' : (totalFloating < 0 ? 'text-rose-400' : 'text-slate-200')}`;
+    }
+
+    function renderConfig(cfg) {
+      currentConfig = {
+        lot_size: cfg.lot_size || 0.01,
+        news_pause: Boolean(cfg.news_pause),
+        api_keys: Array.isArray(cfg.api_keys) ? cfg.api_keys : (cfg.api_keys ? Object.values(cfg.api_keys) : []),
+        active_key_index: cfg.active_key_index || 0
       };
-    }
 
-    // --- LIGHTWEIGHT CHART ---
-    const chartContainer = document.getElementById('tv-chart');
-    const chart = LightweightCharts.createChart(chartContainer, {
-      layout: { background: { color: '#050810' }, textColor: '#94a3b8', fontFamily: 'JetBrains Mono' },
-      grid: { vertLines: { color: '#0c1322' }, horzLines: { color: '#0c1322' } },
-      timeScale: { timeVisible: true, secondsVisible: false, borderColor: '#1e293b' },
-      rightPriceScale: { borderColor: '#1e293b' }
-    });
+      const lotInput = document.getElementById('input-lot');
+      if (document.activeElement !== lotInput) {
+        lotInput.value = Number(currentConfig.lot_size).toFixed(2);
+      }
 
-    const candleSeries = chart.addCandlestickSeries({
-      upColor: '#10b981', downColor: '#f43f5e',
-      borderVisible: false, wickUpColor: '#10b981', wickDownColor: '#f43f5e'
-    });
-    const ema8Series = chart.addLineSeries({ color: '#22d3ee', lineWidth: 2 });
-    const ema21Series = chart.addLineSeries({ color: '#fbbf24', lineWidth: 2 });
-    let activePriceLines = [];
+      const pauseBtn = document.getElementById('btn-news-pause');
+      if (currentConfig.news_pause) {
+        pauseBtn.textContent = "PAUSED";
+        pauseBtn.className = "px-3.5 py-1.5 rounded-lg font-mono text-xs font-bold bg-amber-500 text-obsidian transition";
+      } else {
+        pauseBtn.textContent = "ACTIVE";
+        pauseBtn.className = "px-3.5 py-1.5 rounded-lg font-mono text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition";
+      }
 
-    window.addEventListener('resize', () => {
-      chart.applyOptions({ width: chartContainer.clientWidth });
-    });
-
-    async function fetchFirebaseStatus() {
-      try {
-        const res = await fetch(`${FIREBASE_STATUS}?t=${Date.now()}`);
-        const d = await res.json();
-
-        const badge = document.getElementById('status-badge');
-        const dot = document.getElementById('status-dot');
-        const statusTxt = document.getElementById('status-text');
-
-        if (!d) {
-          statusTxt.textContent = "MENUNGGU MT5";
-          return;
-        }
-
-        const nowMs = Date.now();
-        if (d.heartbeat !== lastSeenHeartbeat) {
-          lastSeenHeartbeat = d.heartbeat;
-          lastHeartbeatChangeMs = nowMs;
-        }
-
-        const utcAgeSec = d.utc_sec ? Math.abs(Math.floor(nowMs / 1000) - d.utc_sec) : 999;
-        const localAgeSec = Math.floor((nowMs - lastHeartbeatChangeMs) / 1000);
-        const isConnected = (utcAgeSec <= 20) || (localAgeSec <= 15);
-
-        currentBotData = d;
-        const metrics = computeProbabilityMetrics(d);
-
-        // Connection Badge
-        if (!isConnected) {
-          badge.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/25";
-          dot.className = "w-2 h-2 rounded-full bg-rose-500";
-          statusTxt.textContent = "OFFLINE";
-        } else if (d.algo_allowed) {
-          badge.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25";
-          dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping";
-          statusTxt.textContent = "ONLINE • LIVE";
-        } else {
-          badge.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/25";
-          dot.className = "w-2 h-2 rounded-full bg-amber-400";
-          statusTxt.textContent = "ALGO MATI";
-        }
-
-        // Top & KPI Updates
-        document.getElementById('header-lot').textContent = Number(d.active_lot || 0.01).toFixed(2);
-        document.getElementById('sub-symbol').textContent = `${d.symbol} (${d.timeframe || 'M5'}) • Smart 3-Layer Pyramiding • Key #${(d.active_key_index ?? 0) + 1}/${d.total_keys || 1}`;
-        document.getElementById('heartbeat-text').textContent = `Pulse #${d.heartbeat}`;
-
-        document.getElementById('kpi-balance').textContent = `$${Number(d.balance || 0).toFixed(2)}`;
-        document.getElementById('kpi-equity').textContent = `$${Number(d.equity || 0).toFixed(2)}`;
-        document.getElementById('spread-pill').textContent = `Spread: ${d.spread}`;
-
-        const regimeEl = document.getElementById('kpi-regime');
-        regimeEl.textContent = d.gemini_bias || 'WAIT';
-        if (d.gemini_bias === 'BUY_ONLY') regimeEl.className = "text-lg sm:text-2xl font-extrabold tracking-tight text-emerald-400";
-        else if (d.gemini_bias === 'SELL_ONLY') regimeEl.className = "text-lg sm:text-2xl font-extrabold tracking-tight text-rose-400";
-        else regimeEl.className = "text-lg sm:text-2xl font-extrabold tracking-tight text-amber-400";
-
-        document.getElementById('kpi-prob').textContent = `Prob ${metrics.trendProb}%`;
-        document.getElementById('kpi-ai-time').textContent = `Sync AI: ${d.gemini_updated || '-'}`;
-
-        const layers = d.active_layers || [];
-        const totalFloating = layers.reduce((acc, item) => acc + (Number(item.profit) || 0), 0);
-        document.getElementById('kpi-layers').textContent = `${d.open_positions || 0} / ${d.max_positions || 3}`;
-
-        const floatEl = document.getElementById('kpi-floating');
-        floatEl.textContent = `${totalFloating >= 0 ? '+' : ''}$${totalFloating.toFixed(2)}`;
-        floatEl.className = `font-mono text-xs sm:text-sm font-bold ${totalFloating >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
-        document.getElementById('kpi-layer-status').textContent = layers.length > 0 ? "Pyramiding & Break-Even aktif" : "Memindai pullback EMA 20";
-
-        document.getElementById('kpi-winrate').textContent = metrics.estWinRate;
-        document.getElementById('kpi-trades').textContent = `Actual WR: ${d.win_rate}% (${d.total_trades}x) • TP: ~${metrics.tpProb}%`;
-
-        // Technical Strip & Waiting Detail
-        document.getElementById('waiting-detail').textContent = d.waiting_detail;
-        document.getElementById('live-price-tag').textContent = `Bid: ${d.bid}`;
-        document.getElementById('chk-ema').textContent = d.ema8 > d.ema21 ? `BULL (${d.ema8})` : `BEAR (${d.ema8})`;
-        document.getElementById('chk-ema').className = `font-mono font-semibold ${d.ema8 > d.ema21 ? 'text-emerald-400' : 'text-rose-400'}`;
-        document.getElementById('chk-rsi').textContent = `${d.rsi}`;
-        document.getElementById('chk-atr').textContent = `${d.atr_m5 || '-'}`;
-        document.getElementById('chk-hl').textContent = `${d.trigger_buy} / ${d.trigger_sell}`;
-
-        // Render Active Layers Grid
-        const layersContainer = document.getElementById('layers-container');
-        if (layers.length > 0) {
-          layersContainer.classList.remove('hidden');
-          layersContainer.innerHTML = layers.map(p => {
-            const profClass = p.profit >= 0 ? "text-emerald-400" : "text-rose-400";
-            const borderClass = p.type === "BUY" ? "border-emerald-500/35" : "border-rose-500/35";
-            const typeBadge = p.type === "BUY"
-              ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-              : "bg-rose-500/15 text-rose-300 border-rose-500/30";
-            const isBE = (p.type === "BUY" && p.sl >= p.entry) || (p.type === "SELL" && p.sl <= p.entry && p.sl > 0);
-
-            return `
-              <div class="bg-[#070b14] border ${borderClass} rounded-xl p-3.5 space-y-2.5 shadow-inner">
-                <div class="flex items-center justify-between gap-2">
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-white">Layer #${p.layer}</span>
-                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${typeBadge}">${p.type} ${p.lot}</span>
-                    ${isBE ? '<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">BE AMAN</span>' : ''}
-                  </div>
-                  <span class="font-mono text-xs font-bold ${profClass}">${p.profit >= 0 ? '+' : ''}$${p.profit.toFixed(2)}</span>
-                </div>
-
-                <div class="grid grid-cols-4 gap-1.5 text-[11px] font-mono pt-1.5 border-t border-slate-800/80">
-                  <div>
-                    <div class="text-slate-500 text-[10px]">Entry (${p.tf})</div>
-                    <div class="text-slate-200 font-semibold">${p.entry}</div>
-                  </div>
-                  <div>
-                    <div class="text-slate-500 text-[10px]">SL</div>
-                    <div class="text-rose-400 font-semibold">${p.sl}</div>
-                  </div>
-                  <div>
-                    <div class="text-slate-500 text-[10px]">TP</div>
-                    <div class="text-emerald-400 font-semibold">${p.tp}</div>
-                  </div>
-                  <div class="text-right">
-                    <div class="text-slate-500 text-[10px]">RR</div>
-                    <div class="text-amber-300 font-semibold">1:${p.rr}</div>
-                  </div>
-                </div>
+      document.getElementById('pool-count-badge').textContent = `${currentConfig.api_keys.length} Keys`;
+      const listEl = document.getElementById('api-key-list');
+      if (currentConfig.api_keys.length === 0) {
+        listEl.innerHTML = `<div class="text-[11px] text-slate-500 italic">Belum ada key di Firebase pool.</div>`;
+      } else {
+        listEl.innerHTML = currentConfig.api_keys.map((k, idx) => {
+          const masked = k.length > 10 ? `${k.slice(0, 6)}••••${k.slice(-4)}` : k;
+          const isActive = idx === currentConfig.active_key_index;
+          return `
+            <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-obsidian/90 border ${isActive ? 'border-amber-500/40' : 'border-white/5'} text-[11px] font-mono">
+              <div class="flex items-center gap-2">
+                <span class="${isActive ? 'text-amber-400 font-bold' : 'text-slate-500'}">#${idx + 1}</span>
+                <span class="text-slate-300">${masked}</span>
               </div>
-            `;
-          }).join('');
-        } else {
-          layersContainer.classList.add('hidden');
-          layersContainer.innerHTML = '';
-        }
-
-        const slotM5 = document.getElementById('slot-M5');
-        slotM5.textContent = layers.length > 0
-          ? `Status: ${layers.length}/${d.max_positions || 3} Layer Terbuka (${d.gemini_bias})`
-          : `Status: Mode ${d.gemini_bias} • Memindai Peluang Entry M5`;
-
-        // Update Chart Candles & Price Lines
-        if (d.candles && d.candles.length > 0) {
-          candleSeries.setData(d.candles.map(c => ({
-            time: c.time, open: c.open, high: c.high, low: c.low, close: c.close
-          })));
-          ema8Series.setData(d.candles.map(c => ({ time: c.time, value: c.ema8 })));
-          ema21Series.setData(d.candles.map(c => ({ time: c.time, value: c.ema21 })));
-
-          activePriceLines.forEach(line => candleSeries.removePriceLine(line));
-          activePriceLines = [];
-
-          if (layers.length > 0) {
-            layers.forEach(p => {
-              activePriceLines.push(candleSeries.createPriceLine({
-                price: p.tp, color: '#10b981', lineWidth: 2,
-                lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: `TP L${p.layer}`
-              }));
-              activePriceLines.push(candleSeries.createPriceLine({
-                price: p.sl, color: '#f43f5e', lineWidth: 2,
-                lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: `SL L${p.layer}`
-              }));
-            });
-          } else {
-            activePriceLines.push(candleSeries.createPriceLine({
-              price: d.trigger_buy, color: '#10b981', lineWidth: 1,
-              lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'High M5'
-            }));
-            activePriceLines.push(candleSeries.createPriceLine({
-              price: d.trigger_sell, color: '#f43f5e', lineWidth: 1,
-              lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Low M5'
-            }));
-          }
-        }
-      } catch (err) {}
+              <button onclick="removeApiKey(${idx})" class="text-rose-400 hover:text-rose-300 px-1">Hapus</button>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
-    loadConfigFromFirebase();
-    setInterval(fetchFirebaseStatus, 2000);
-    fetchFirebaseStatus();
-
-    function buildLocalFallbackReply(d, apiErrMsg) {
-      if (!d) return "Data MT5 belum masuk ke Firebase. Pastikan MT5 menyala dan Algo Trading aktif.";
-      const m = computeProbabilityMetrics(d);
-      const layers = d.active_layers || [];
-      let posSection = "• Status Posisi: Belum ada layer terbuka (memindai sinyal M5).\n";
-      if (layers.length > 0) {
-        posSection = layers.map(p =>
-          `• Layer #${p.layer} (${p.type} ${p.symbol} TF ${p.tf} | Lot ${p.lot}): Entry ${p.entry} | SL ${p.sl} | TP ${p.tp} (RR 1:${p.rr}) | Floating ${p.profit >= 0 ? '+' : ''}$${p.profit.toFixed(2)}`
-        ).join('\n') + '\n';
-      }
-
-      return `[STARRI Live Telemetry v11.00]\n` +
-             posSection +
-             `• Regime AI (15m): ${d.gemini_bias} (Probabilitas tren: ~${m.trendProb}%)\n` +
-             `• Peluang Nyampe ke TP (RR >= 1:2): ~${m.tpProb}% | Perkiraan Win Rate: ${m.estWinRate}\n` +
-             `• Status: ${d.waiting_detail}\n` +
-             `(Info API: ${apiErrMsg})`;
+    function quickLot(val) {
+      document.getElementById('input-lot').value = val.toFixed(2);
+      updateLotSize();
     }
 
-    function appendChat(sender, text, isUser = false) {
-      const box = document.getElementById('chat-box');
-      const div = document.createElement('div');
-      div.className = isUser
-        ? "bg-amber-500/15 border border-amber-500/30 text-amber-100 p-3 rounded-xl ml-6 leading-relaxed"
-        : "bg-[#070b14] border border-slate-800/90 text-slate-200 p-3 rounded-xl mr-3 leading-relaxed";
-      div.innerHTML = `<div class="font-bold text-[10px] mb-1 ${isUser ? 'text-amber-400' : 'text-cyan-400'}">${sender}</div><div>${text.replace(/\n/g, '<br>')}</div>`;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
+    async function updateLotSize() {
+      const val = parseFloat(document.getElementById('input-lot').value);
+      if (isNaN(val) || val < 0.01) return;
+      const statusEl = document.getElementById('lot-sync-status');
+      statusEl.textContent = "Menyimpan...";
+      statusEl.className = "font-mono text-[11px] text-amber-400";
+
+      await fetch(`${FIREBASE_URL}/config/lot_size.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Number(val.toFixed(2)))
+      });
+
+      statusEl.textContent = "Tersinkron ✓";
+      statusEl.className = "font-mono text-[11px] text-emerald-400";
+      pollFirebase();
     }
 
-    async function askBotAI(question) {
-      appendChat('Kamu', question, true);
-      const btn = document.getElementById('send-btn');
-      btn.disabled = true;
-      btn.textContent = '...';
-
-      const keys = await loadConfigFromFirebase();
-      if (keys.length === 0) {
-        appendChat('STARRI Monitor', buildLocalFallbackReply(currentBotData, "Belum ada API Key di Firebase"), false);
-        btn.disabled = false;
-        btn.textContent = 'Kirim';
-        return;
-      }
-
-      const m = computeProbabilityMetrics(currentBotData);
-      const layers = currentBotData?.active_layers || [];
-      let posContext = "POSISI TERBUKA: TIDAK ADA layer aktif saat ini.";
-      if (layers.length > 0) {
-        posContext = "POSISI PYRAMIDING AKTIF (" + layers.length + " Layer):\n" + layers.map(p =>
-          `- Layer #${p.layer}: ${p.type} ${p.symbol}, Timeframe: ${p.tf}, Lot: ${p.lot}, Entry: ${p.entry}, SL: ${p.sl}, TP: ${p.tp}, Rasio RR: 1:${p.rr}, Floating: $${p.profit.toFixed(2)}`
-        ).join('\n');
-      }
-
-      const liveContext = currentBotData
-        ? `Data Live STARRI MT5 v11.00 -> Symbol: ${currentBotData.symbol}, TF: M5, Bid: ${currentBotData.bid}, Ask: ${currentBotData.ask}, Base Lot: ${currentBotData.active_lot}, Regime AI: ${currentBotData.gemini_bias} (Update: ${currentBotData.gemini_updated}), EMA20 M5: ${currentBotData.ema8}, EMA50 M5: ${currentBotData.ema21}, RSI(14) M5: ${currentBotData.rsi}, ATR M5: ${currentBotData.atr_m5}, Estimasi Statistik: Probabilitas Tren ~${m.trendProb}%, Peluang Menyentuh TP ~${m.tpProb}%, Perkiraan Win Rate ${m.estWinRate}, Status Mesin: "${currentBotData.waiting_detail}".\n${posContext}`
-        : "MT5 belum terhubung ke Firebase saat ini.";
-
-      const fullPrompt =
-        `Kamu adalah STARRI AI, analis kuantitatif & asisten bot trading Gold (XAUUSD) v11.00 khusus M5 dengan sistem Smart 3-Layer Pyramiding.\n` +
-        `ATURAN WAJIB JAWABAN:\n` +
-        `1. Selalu sertakan PROBABILITAS (%) arah tren Gold berdasarkan Regime AI dan indikator.\n` +
-        `2. Selalu berikan estimasi peluang (%) apakah harga akan menyentuh target TP (RR minimal 1:2) beserta perkiraan kisaran WIN RATE-nya.\n` +
-        `3. Jika ada posisi terbuka (baik 1, 2, maupun 3 layer), sebutkan detail masing-masing layer secara jelas: Layer ke berapa, Timeframe (M5), Harga Entry, SL (termasuk jika sudah Break-Even), TP, rasio RR, dan floating profit/loss-nya.\n` +
-        `4. Jawab dalam Bahasa Indonesia yang ringkas, profesional, dan langsung ke inti.\n\n` +
-        `DATA LIVE SISTEM STARRI:\n${liveContext}\n\nPertanyaan user: ${question}`;
-
-      let lastError = "Semua key limit";
-
-      for (let attempt = 0; attempt < keys.length; attempt++) {
-        const tryIdx = (activeKeyIndex + attempt) % keys.length;
-        const tryKey = keys[tryIdx];
-
-        for (const model of GEMINI_MODELS) {
-          try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(tryKey)}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
-            });
-            const data = await response.json();
-            const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (reply) {
-              if (tryIdx !== activeKeyIndex) await saveActiveKeyIndex(tryIdx);
-              document.getElementById('key-badge').textContent = `Key #${tryIdx + 1}/${keys.length}`;
-              appendChat(`STARRI AI (Key #${tryIdx + 1})`, reply, false);
-              btn.disabled = false;
-              btn.textContent = 'Kirim';
-              return;
-            }
-            lastError = data?.error?.message || `HTTP ${response.status}`;
-            if (response.status === 429 || response.status === 403 || response.status === 400) break;
-          } catch (e) {
-            lastError = e.message || "Network error";
-          }
-        }
-      }
-
-      appendChat('STARRI Monitor', buildLocalFallbackReply(currentBotData, lastError), false);
-      btn.disabled = false;
-      btn.textContent = 'Kirim';
+    async function toggleNewsPause() {
+      const nextState = !currentConfig.news_pause;
+      await fetch(`${FIREBASE_URL}/config/news_pause.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nextState)
+      });
+      pollFirebase();
     }
 
-    function quickAsk(text) { askBotAI(text); }
+    async function addApiKey() {
+      const input = document.getElementById('input-new-key');
+      const newKey = input.value.trim();
+      if (newKey.length < 15) return;
 
-    document.getElementById('chat-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const input = document.getElementById('chat-input');
-      const q = input.value.trim();
-      if (!q) return;
-      input.value = '';
-      askBotAI(q);
+      const updated = [...currentConfig.api_keys, newKey];
+      await fetch(`${FIREBASE_URL}/config/api_keys.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
+      input.value = "";
+      pollFirebase();
+    }
+
+    async function removeApiKey(index) {
+      const updated = currentConfig.api_keys.filter((_, i) => i !== index);
+      await fetch(`${FIREBASE_URL}/config/api_keys.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
+      pollFirebase();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initChart();
+      pollFirebase();
+      setInterval(pollFirebase, 2000);
     });
   </script>
 </body>
